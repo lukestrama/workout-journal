@@ -3,16 +3,16 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { loadWorkouts, saveWorkouts } from "@/lib/storage";
-import { Exercise, Workout } from "../../../types/workout";
+import { ExerciseSet,Exercise, Workout } from "../../../types/workout";
 import { v4 as uuid } from "uuid";
 
 export default function WorkoutPage() {
   const { id } = useParams<{ id: string }>();
   const [workout, setWorkout] = useState<Workout | null>(null);
-  const [name, setName] = useState("");
-  const [reps, setReps] = useState<number | undefined>();
-  const [weight, setWeight] = useState<number | undefined>();
-
+  const [exerciseName, setExerciseName] = useState("");
+  const [reps, setReps] = useState<number>(0);
+  const [weight, setWeight] = useState<number>(0);
+  
   // TODO: Move this out of a useEffect
   useEffect(() => { 
     const workouts = loadWorkouts();
@@ -22,18 +22,35 @@ export default function WorkoutPage() {
 
   const addSet = () => {
     if (!workout) return;
-    const newExercise: Exercise = {
-      id: uuid(),
-      name,
-      reps,
-      weight,
-    };
+    const newSet: ExerciseSet = {
+      weight: weight || 0,
+      reps: reps || 0
+    }
     
-    const updated = { ...workout, exercises: [...workout.exercises, newExercise] };
-    const all = loadWorkouts().map((w) => (w.id === id ? updated : w));
+    let existingExercise = workout.exercises.find(ex => ex.name === exerciseName);
+    let all: Workout[], updated: Workout;
+    if (existingExercise) {
+      // keep everything as is, add the new set
+      existingExercise = { ...existingExercise, sets: [...existingExercise.sets, newSet] };
+      
+      const updatedExercises: Exercise[] = workout.exercises.map(ex => ex.name === exerciseName ? existingExercise! : ex);
+      updated = { ...workout, exercises: updatedExercises };
+      all = loadWorkouts().map((w) => (w.id === id ? updated : w));
+    } else {
+      const newExercise: Exercise = {
+        id: uuid(),
+        name: exerciseName,
+        sets: [newSet]
+      };
+
+      updated = { ...workout, exercises: [...workout.exercises, newExercise] };
+      all = loadWorkouts().map((w) => (w.id === id ? updated : w));
+    }
+    
     saveWorkouts(all);
     setWorkout(updated);
     setWeight(0);
+    setReps(0);
   };
 
   if (!workout) return <p>Loading...</p>;
@@ -48,17 +65,17 @@ export default function WorkoutPage() {
         <input
           className="border p-2 w-full"
           placeholder="Exercise name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={exerciseName}
+          onChange={(e) => setExerciseName(e.target.value)}
           />
-          <label>Reps</label>
-          <input
-            className="border p-2 w-full"
-            type="number"
-            placeholder="Weight (kg)"
-            value={weight}
-            onChange={(e) => setWeight(Number(e.target.value))}
-          /> X
+        <label>Weight</label>
+        <input
+          className="border p-2 w-full"
+          type="number"
+          placeholder="Weight (kg)"
+          value={weight}
+          onChange={(e) => setWeight(Number(e.target.value))}
+        /> X
         <input
           className="border p-2 w-full"
           type="number"
@@ -78,7 +95,10 @@ export default function WorkoutPage() {
       <ul className="space-y-2">
         {workout.exercises.map((ex) => (
           <li key={ex.id}>
-            {ex.name} – {ex.sets}×{ex.reps} @ {ex.weight}kg
+            {ex.name} - 
+            {ex.sets.map((set, idx) => (
+              <span key={idx}>{idx > 0 ? ', ' : ' '}{set.weight}x{set.reps}</span>
+            ))}
           </li>
         ))}
       </ul>
