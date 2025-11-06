@@ -1,10 +1,8 @@
-import { createClient } from "@/lib/supabase/client"
 import { Workout } from "./models";
-
-const supabase = createClient()
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export const workoutService = {
-    async getWorkouts(userId: string): Promise<Workout[]> {
+    async getWorkouts(supabase: SupabaseClient, userId: string): Promise<Workout[]> {
         const { data, error } = await supabase
         .from("workouts")
         .select("*")
@@ -16,7 +14,7 @@ export const workoutService = {
         return data || []
     },
 
-    async createWorkout(workout: Omit<Workout, 'id' | 'created_at' | 'exercises'>): Promise<Workout> {
+    async createWorkout(supabase: SupabaseClient, workout: Omit<Workout, 'id' | 'created_at' | 'exercises'>): Promise<Workout> {
         const { data, error } = await supabase
         .from("workouts")
         .insert(workout)

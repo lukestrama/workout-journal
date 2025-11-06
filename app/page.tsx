@@ -1,31 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { Workout } from "@/lib/supabase/models";
 import LoginButton from "./components/LoginButton";
-import { workoutService } from "@/lib/supabase/services";
-import { createClient } from '@/lib/supabase/client'
-import { useWorkouts } from "@/lib/hooks/useWorkouts";
-import { type User } from "@supabase/supabase-js";
+import { useUser } from "@clerk/nextjs";
 
 export default function HomePage() {
-  const getUser = async () => {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    return user
-  }
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useUser()
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const userData = await getUser();
-      setUser(userData);
-    };
-    
-    fetchUser();
-  }, []);
-  
   return (
     <main className="p-6">
       {user ? (
