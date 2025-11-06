@@ -1,6 +1,7 @@
 export interface ExerciseSet {
   weight: number,
   reps: number,
+  exercise_id: string
   notes?: string
 }
 
@@ -8,6 +9,7 @@ export interface Exercise {
   id: string;
   name: string;
   sets: ExerciseSet[];
+
 }
 
 export interface Workout {
@@ -15,4 +17,5 @@ export interface Workout {
   title: string;
   date: string;
   exercises: Exercise[];
+  user_id: string;
 }

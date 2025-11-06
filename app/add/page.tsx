@@ -2,25 +2,27 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { loadWorkouts, saveWorkouts } from "@/lib/storage";
-import { Workout } from "@/types/workout";
-import { v4 as uuid } from "uuid";
+import { Workout } from "@/lib/supabase/models";
+import { useWorkouts } from "@/lib/hooks/useWorkouts";
+import { createClient } from "@/lib/supabase/client";
+import { type User } from '@supabase/supabase-js'
 
 export default function AddWorkoutPage() {
   const router = useRouter();
+  const user = async () => {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    return user
+  }
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
+  const { createWorkout } = useWorkouts()
 
-  const handleSave = () => {
-    const workouts = loadWorkouts();
-    const newWorkout: Workout = {
-      id: uuid(),
-      title,
-      date,
-      exercises: [],
-    };
-    saveWorkouts([...workouts, newWorkout]);
-    router.push(`/workout/${newWorkout.id}`);
+  const handleSave = async () => {
+    const u = await user()
+    if (u) {
+      createWorkout(title, date, u.id)
+    }
   };
 
   return (

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { loadWorkouts, saveWorkouts } from "@/lib/storage";
-import { ExerciseSet,Exercise, Workout } from "../../../types/workout";
+import { ExerciseSet, Exercise, Workout } from "@/lib/supabase/models";
 import { v4 as uuid } from "uuid";
 import Link from "next/link";
 
