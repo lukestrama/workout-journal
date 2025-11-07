@@ -2,20 +2,17 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { loadWorkouts, saveWorkouts } from "@/lib/storage";
 import { ExerciseSet, Exercise, Workout } from "@/lib/supabase/models";
-import { v4 as uuid } from "uuid";
 import Link from "next/link";
+import { useWorkout } from "@/lib/hooks/useWorkouts";
 
 const defaultWeight = 0
 const defaultReps = 0
 
 export default function WorkoutPage() {
   const { id } = useParams<{ id: string }>();
-  const [workout, setWorkout] = useState<Workout | null>(() => {
-    const workouts = loadWorkouts();
-    return workouts.find((w) => w.id === id) || null;
-  });
+  const { workout, exercises } = useWorkout(id)
+
   const [exerciseName, setExerciseName] = useState("");
   const [reps, setReps] = useState<number>(defaultWeight);
   const [weight, setWeight] = useState<number>(defaultReps);
@@ -23,33 +20,31 @@ export default function WorkoutPage() {
 
   const addSet = () => {
     if (!workout) return;
-    const newSet: ExerciseSet = {
-      weight: weight || defaultWeight,
-      reps: reps || defaultReps
-    }
+    // const newSet: ExerciseSet = {
+    //   weight: weight || defaultWeight,
+    //   reps: reps || defaultReps
+    // }
     
-    let existingExercise = workout.exercises.find(ex => ex.name === exerciseName);
-    let allWorkouts: Workout[], updatedWorkout: Workout;
-    if (existingExercise) {
-      // keep everything as is, add the new set
-      existingExercise = { ...existingExercise, sets: [...existingExercise.sets, newSet] };
+    // let existingExercise = workout.exercises.find(ex => ex.name === exerciseName);
+    // let allWorkouts: Workout[], updatedWorkout: Workout;
+    // if (existingExercise) {
+    //   // keep everything as is, add the new set
+    //   existingExercise = { ...existingExercise, sets: [...existingExercise.sets, newSet] };
       
-      const updatedExercises: Exercise[] = workout.exercises.map(ex => ex.name === exerciseName ? existingExercise! : ex);
-      updatedWorkout = { ...workout, exercises: updatedExercises };
-      allWorkouts = loadWorkouts().map((w) => (w.id === id ? updatedWorkout : w));
-    } else {
-      const newExercise: Exercise = {
-        id: uuid(),
-        name: exerciseName,
-        sets: [newSet]
-      };
+    //   const updatedExercises: Exercise[] = workout.exercises.map(ex => ex.name === exerciseName ? existingExercise! : ex);
+    //   updatedWorkout = { ...workout, exercises: updatedExercises };
+    //   allWorkouts = loadWorkouts().map((w) => (w.id === id ? updatedWorkout : w));
+    // } else {
+    //   const newExercise: Exercise = {
+    //     id: uuid(),
+    //     name: exerciseName,
+    //     sets: [newSet]
+    //   };
 
-      updatedWorkout = { ...workout, exercises: [...workout.exercises, newExercise] };
-      allWorkouts = loadWorkouts().map((w) => (w.id === id ? updatedWorkout : w));
-    }
+    //   updatedWorkout = { ...workout, exercises: [...workout.exercises, newExercise] };
+    //   allWorkouts = loadWorkouts().map((w) => (w.id === id ? updatedWorkout : w));
+    // }
     
-    saveWorkouts(allWorkouts);
-    setWorkout(updatedWorkout);
     setWeight(defaultWeight);
     setReps(defaultReps);
   };
@@ -97,14 +92,16 @@ export default function WorkoutPage() {
 
       <h3 className="font-bold mb-2">Exercises</h3>
       <ul className="space-y-2">
-        {workout.exercises.map((ex) => (
-          <li key={ex.id}>
-            {ex.name} - 
-            {ex.sets.map((set, idx) => (
-              <span key={idx}>{idx > 0 ? ', ' : ' '}{set.weight}x{set.reps}</span>
-            ))}
-          </li>
-        ))}
+        {exercises.length ? (
+          exercises.map((ex) => (
+            <li key={ex.id}>
+              {ex.name} - 
+              {ex.sets.map((set, idx) => (
+                <span key={idx}>{idx > 0 ? ', ' : ' '}{set.weight}x{set.reps}</span>
+              ))}
+            </li>
+          ))
+        ) : ''}
       </ul>
     </main>
   );
