@@ -37,22 +37,28 @@ export function useWorkouts() {
     }
   }, [user, supabase, loadWorkouts]);
 
-  async function createWorkout(title: string, date: string) {
+  async function createWorkout(title: string, date: string): Promise<Workout | undefined> {
     if (!user) throw Error("Must be signed in to create a workout");
+    let workout: Workout;
+
     try {
       setLoading(true);
-      const workout = await workoutService.createWorkout(supabase!, {
+      workout = await workoutService.createWorkout(supabase!, {
         title,
         date,
         user_id: user.id,
       });
+      
       setWorkouts((prev) => [workout, ...prev]);
+      
+      return workout
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Failed to create workout"
       );
     }
   }
+
   return { workouts, loading, error, createWorkout };
 }
 

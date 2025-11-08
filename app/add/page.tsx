@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useWorkouts } from "@/lib/hooks/useWorkouts";
+import { Workout } from "@/lib/supabase/models";
 
 export default function AddWorkoutPage() {
   const router = useRouter();
@@ -13,7 +14,8 @@ export default function AddWorkoutPage() {
 
 
   const handleSave = async () => {
-    await createWorkout(title, date)  
+    const workout: Workout | undefined = await createWorkout(title, date)
+    if (workout) router.push(`/workout/${workout.id}`)
   };
 
   return (
