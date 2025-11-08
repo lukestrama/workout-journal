@@ -11,7 +11,7 @@ const defaultReps = 0
 
 export default function WorkoutPage() {
   const { id } = useParams<{ id: string }>();
-  const { workout, exercises, createSet, createExercise } = useWorkout(id)
+  const { workout, exercises, createSet, createOrGetExercise } = useWorkout(id)
 
   const [exerciseName, setExerciseName] = useState("");
   const [reps, setReps] = useState<number>(defaultWeight);
@@ -21,10 +21,10 @@ export default function WorkoutPage() {
   const addSet = async () => {
     if (!workout) return;
 
-    const exercise = await createExercise(exerciseName)
+    const exercise = await createOrGetExercise(exerciseName)
 
     if (exercise) {
-      createSet(exercise.id, { reps, weight })
+      createSet(exercise, { reps, weight })
     }
     
     setWeight(defaultWeight);

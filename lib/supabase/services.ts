@@ -57,6 +57,26 @@ export const exerciseService = {
         return data || [];
     },
 
+    async getOrCreateExercise(supabase: SupabaseClient, exercise: Omit<Exercise, 'id' | 'created_at' | 'sets'>): Promise<Exercise> {
+        // 1. Check if exercise already exists for this workout
+        const { data: existing, error: findError } = await supabase
+            .from("exercises")
+            .select("*")
+            .eq("workout_id", exercise.workout_id)
+            .eq("name", exercise.name)
+            .maybeSingle();
+
+        if (findError) throw findError;
+
+        if (existing) {
+            // Found existing exercise → reuse it
+            return existing;
+        }
+
+        // 2. If not found, create a new one
+        return this.createExercise(supabase, exercise)
+    },
+
     async createExercise(supabase: SupabaseClient, exercise: Omit<Exercise, 'id' | 'created_at' | 'sets'>): Promise<Exercise> {
         const { data, error } = await supabase
             .from("exercises")
