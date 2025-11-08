@@ -1,4 +1,4 @@
-import { workoutDataService, workoutService } from "../supabase/services"
+import { exerciseService, setsService, workoutDataService, workoutService } from "../supabase/services"
 import { useUser } from "@clerk/nextjs"
 import { Exercise, Workout } from "../supabase/models"
 import { useEffect, useState, useCallback } from "react"
@@ -11,7 +11,7 @@ export function useWorkouts() {
     const [workouts, setWorkouts] = useState<Workout[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>('')
-   
+
     const loadWorkouts = useCallback(async () => {
         if (!user) return;
         try {
@@ -26,14 +26,14 @@ export function useWorkouts() {
         }
     }, [user, supabase])
 
-     useEffect(() => {
+    useEffect(() => {
         if (user) {
             loadWorkouts()
         }
     }, [user, supabase, loadWorkouts])
 
     async function createWorkout(title: string, date: string) {
-        
+
         if (!user) throw Error('Must be signed in to create a workout')
         try {
             setLoading(true)
@@ -79,5 +79,48 @@ export function useWorkout(workoutId: string) {
         }
     }, [workoutId, supabase, loadWorkout])
 
-    return { workout, loading, error, exercises }
+
+    async function createExercise(name: string) {
+        if (!workout || !user) throw new Error("Workout not loaded");
+
+        try {
+            const newExercise = await exerciseService.createExercise(supabase!, {
+                name,
+                workout_id: workout.id,
+            });
+
+            setExercises((prev) => [...prev, { ...newExercise, sets: [] }]);
+            return newExercise;
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to create exercise.");
+        }
+    }
+
+    async function createSet(
+        exerciseId: string,
+        setData: {
+            reps: number,
+            weight: number
+        }
+    ) {
+        try {
+            const newSet = await setsService.createSet(supabase!, {
+                ...setData, exercise_id: exerciseId
+            })
+
+            setExercises((prev) =>
+                prev.map((exercise) => {
+                    console.log('exercise', exercise)
+                    return exercise.id === exerciseId ? { ...exercise, sets: [...exercise.sets, newSet] } : exercise
+                }
+                )
+            )
+            return newSet
+        } catch (err) {
+            setError(
+                err instanceof Error ? err.message : "Failed to create the set."
+            );
+        }
+    }
+    return { workout, loading, error, exercises, createSet, createExercise }
 }

@@ -11,15 +11,21 @@ const defaultReps = 0
 
 export default function WorkoutPage() {
   const { id } = useParams<{ id: string }>();
-  const { workout, exercises } = useWorkout(id)
+  const { workout, exercises, createSet, createExercise } = useWorkout(id)
 
   const [exerciseName, setExerciseName] = useState("");
   const [reps, setReps] = useState<number>(defaultWeight);
   const [weight, setWeight] = useState<number>(defaultReps);
 
 
-  const addSet = () => {
+  const addSet = async () => {
     if (!workout) return;
+
+    const exercise = await createExercise(exerciseName)
+
+    if (exercise) {
+      createSet(exercise.id, {reps, weight})
+    }
     // const newSet: ExerciseSet = {
     //   weight: weight || defaultWeight,
     //   reps: reps || defaultReps
@@ -96,7 +102,7 @@ export default function WorkoutPage() {
           exercises.map((ex) => (
             <li key={ex.id}>
               {ex.name} - 
-              {ex.sets.map((set, idx) => (
+              {ex.sets?.map((set, idx) => (
                 <span key={idx}>{idx > 0 ? ', ' : ' '}{set.weight}x{set.reps}</span>
               ))}
             </li>

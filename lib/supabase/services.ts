@@ -56,28 +56,56 @@ export const exerciseService = {
 
         return data || [];
     },
+
+    async createExercise(supabase: SupabaseClient, exercise: Omit<Exercise, 'id' | 'created_at' | 'sets'>): Promise<Exercise> {
+        const { data, error } = await supabase
+            .from("exercises")
+            .insert(exercise)
+            .select()
+            .single()
+
+        if (error) throw error;
+
+        return data
+    }
 }
 
 export const setsService = {
     async getSetsByWorkout(
-    supabase: SupabaseClient,
-    workoutId: string
-  ): Promise<ExerciseSet[]> {
-    const { data, error } = await supabase
-      .from("sets")
-      .select(
-        `
+        supabase: SupabaseClient,
+        workoutId: string
+    ): Promise<ExerciseSet[]> {
+        const { data, error } = await supabase
+            .from("sets")
+            .select(
+                `
         *,
         exercises!inner(workout_id)
         `
-      )
-      .eq("exercises.workout_id", workoutId)
-      .order("created_at", { ascending: true });
+            )
+            .eq("exercises.workout_id", workoutId)
+            .order("created_at", { ascending: true });
 
-    if (error) throw error;
+        if (error) throw error;
 
-    return data || [];
-  },
+        return data || [];
+    },
+
+    async createSet(
+        supabase: SupabaseClient,
+        set: Omit<ExerciseSet, "id" | "created_at" | "updated_at">
+    ): Promise<ExerciseSet> {
+        console.log(set, "hejka")
+        const { data, error } = await supabase
+            .from("sets")
+            .insert(set)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        return data;
+    },
 }
 
 export const workoutDataService = {
@@ -92,7 +120,7 @@ export const workoutDataService = {
         const sets = await setsService.getSetsByWorkout(supabase, workoutId);
 
         const exercisesWithSets = exercises.map((exercise) => ({
-            ...exercise, 
+            ...exercise,
             sets: sets.filter(set => set.exercise_id === exercise.id)
         }))
 

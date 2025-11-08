@@ -13,7 +13,7 @@ export default function HomePage() {
     <main className="p-6">
       {!user ? (
         <LoginButton />
-      ): (
+      ) : (
         <>
           <h1 className="text-2xl font-bold mb-4">🏋️ My Workouts</h1>
           <Link href="/add" className="text-blue-500 underline mb-4 block">
