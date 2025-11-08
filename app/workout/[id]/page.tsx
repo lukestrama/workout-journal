@@ -24,32 +24,8 @@ export default function WorkoutPage() {
     const exercise = await createExercise(exerciseName)
 
     if (exercise) {
-      createSet(exercise.id, {reps, weight})
+      createSet(exercise.id, { reps, weight })
     }
-    // const newSet: ExerciseSet = {
-    //   weight: weight || defaultWeight,
-    //   reps: reps || defaultReps
-    // }
-    
-    // let existingExercise = workout.exercises.find(ex => ex.name === exerciseName);
-    // let allWorkouts: Workout[], updatedWorkout: Workout;
-    // if (existingExercise) {
-    //   // keep everything as is, add the new set
-    //   existingExercise = { ...existingExercise, sets: [...existingExercise.sets, newSet] };
-      
-    //   const updatedExercises: Exercise[] = workout.exercises.map(ex => ex.name === exerciseName ? existingExercise! : ex);
-    //   updatedWorkout = { ...workout, exercises: updatedExercises };
-    //   allWorkouts = loadWorkouts().map((w) => (w.id === id ? updatedWorkout : w));
-    // } else {
-    //   const newExercise: Exercise = {
-    //     id: uuid(),
-    //     name: exerciseName,
-    //     sets: [newSet]
-    //   };
-
-    //   updatedWorkout = { ...workout, exercises: [...workout.exercises, newExercise] };
-    //   allWorkouts = loadWorkouts().map((w) => (w.id === id ? updatedWorkout : w));
-    // }
     
     setWeight(defaultWeight);
     setReps(defaultReps);
@@ -103,7 +79,7 @@ export default function WorkoutPage() {
             <li key={ex.id}>
               {ex.name} - 
               {ex.sets?.map((set, idx) => (
-                <span key={idx}>{idx > 0 ? ', ' : ' '}{set.weight}x{set.reps}</span>
+                <span key={set.id}>{idx > 0 ? ', ' : ' '}{set.weight}x{set.reps}</span>
               ))}
             </li>
           ))

@@ -2,7 +2,8 @@ export interface ExerciseSet {
     weight: number,
     reps: number,
     exercise_id: string
-    notes?: string
+    notes?: string,
+    id: string
 }
 
 export interface Exercise {
