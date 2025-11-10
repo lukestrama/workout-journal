@@ -5,7 +5,7 @@ import {
   workoutService,
 } from "../supabase/services";
 import { useUser } from "@clerk/nextjs";
-import { Exercise, Workout } from "../supabase/models";
+import { Exercise, UserExercise, Workout } from "../supabase/models";
 import { useEffect, useState, useCallback } from "react";
 import { useSupabase } from "../supabase/SupabaseProvider";
 
@@ -67,6 +67,7 @@ export function useWorkout(workoutId: string) {
   const { supabase } = useSupabase();
 
   const [workout, setWorkout] = useState<Workout | null>(null);
+  const [userExercises, setUserExercises] = useState<UserExercise[]>([])
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>("");
@@ -136,6 +137,30 @@ export function useWorkout(workoutId: string) {
     }
   }
 
+  const loadUserExercises = useCallback(async () => {
+    if (!workoutId || !user) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      const userExercises = await exerciseService.getUserExercises(
+        supabase!,
+        user.id
+      )
+      setUserExercises(userExercises)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load workout.");
+    } finally {
+      setLoading(false);
+    }
+  }, [supabase, user, workoutId])
+
+  useEffect(() => {
+    if (user) {
+      loadUserExercises()
+    }
+  }, [user, loadUserExercises])
+  
   async function createSet(
     exercise: Exercise,
     setData: {
@@ -174,6 +199,7 @@ export function useWorkout(workoutId: string) {
     loading,
     error,
     exercises,
+    userExercises,
     createSet,
     createExercise,
     createOrGetExercise,

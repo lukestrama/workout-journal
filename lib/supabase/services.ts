@@ -57,6 +57,18 @@ export const exerciseService = {
         return data || [];
     },
 
+    async getUserExercises(supabase: SupabaseClient, userId: string) {
+         const { data, error } = await supabase
+            .from("user_exercises")
+            .select("*")
+            .eq("user_id", userId)
+            .order("name", { ascending: true });
+
+        if (error) throw error;
+
+        return data || [];
+    },
+
     async getOrCreateExercise(supabase: SupabaseClient, exercise: Omit<Exercise, 'id' | 'created_at' | 'sets'>): Promise<Exercise> {
         // 1. Check if exercise already exists for this workout
         const { data: existing, error: findError } = await supabase

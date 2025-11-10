@@ -20,3 +20,9 @@ export interface Workout {
     exercises: Exercise[];
     user_id: string;
 }
+
+export interface UserExercise {
+    id: string;
+    name: string;
+    user_id: string;
+}
