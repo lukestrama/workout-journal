@@ -1,4 +1,4 @@
-import { Exercise, ExerciseSet, Workout } from "./models";
+import { Exercise, ExerciseSet, UserExercise, Workout } from "./models";
 import { SupabaseClient } from "@supabase/supabase-js";
 
 export const workoutService = {
@@ -38,7 +38,6 @@ export const workoutService = {
 
         return data
     }
-
 }
 
 export const exerciseService = {
@@ -92,6 +91,21 @@ export const exerciseService = {
     async createExercise(supabase: SupabaseClient, exercise: Omit<Exercise, 'id' | 'created_at' | 'sets'>): Promise<Exercise> {
         const { data, error } = await supabase
             .from("exercises")
+            .insert(exercise)
+            .select()
+            .single()
+
+        if (error) throw error;
+
+        return data
+    }
+}
+
+// this service is responsible for adding exercises to a user's list of exercises. IE the list that they'll see in their drop down menu for exercises
+export const userExercisesService = {
+    async createUserExercise(supabase: SupabaseClient, exercise: Omit<UserExercise, 'id' | 'created_at'>): Promise<UserExercise> {
+        const { data, error } = await supabase
+            .from("user_exercises")
             .insert(exercise)
             .select()
             .single()

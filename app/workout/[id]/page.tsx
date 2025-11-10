@@ -12,7 +12,7 @@ const defaultReps = 0;
 
 export default function WorkoutPage() {
   const { id } = useParams<{ id: string }>();
-  const { workout, exercises, userExercises, createSet, createExercise, createOrGetExercise } =
+  const { workout, exercises, userExercises, createSet, createUserExercise, createOrGetExercise } =
     useWorkout(id);
 
   const [exerciseName, setExerciseName] = useState("");
@@ -25,7 +25,7 @@ export default function WorkoutPage() {
   ): Promise<void> => {
     if (action === "create-option" && option?.value) {
       try {
-        await createExercise(option.value)
+        await createUserExercise(option.value)
       } catch (err) {
         console.log(err)
       } finally {

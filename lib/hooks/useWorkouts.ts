@@ -3,6 +3,7 @@ import {
   setsService,
   workoutDataService,
   workoutService,
+  userExercisesService
 } from "../supabase/services";
 import { useUser } from "@clerk/nextjs";
 import { Exercise, UserExercise, Workout } from "../supabase/models";
@@ -118,17 +119,15 @@ export function useWorkout(workoutId: string) {
     }
   }
 
-  async function createExercise(name: string) {
+  async function createUserExercise(name: string) {
     if (!workout || !user) throw new Error("Workout not loaded");
 
     try {
-      const newExercise = await exerciseService.createExercise(supabase!, {
+      const newExercise = await userExercisesService.createUserExercise(supabase!, {
         name,
-        workout_id: workout.id,
+        user_id: user.id,
       });
 
-      setExercises((prev) => [...prev, { ...newExercise, sets: [] }]);
-      
       return newExercise;
     } catch (err) {
       setError(
@@ -201,7 +200,7 @@ export function useWorkout(workoutId: string) {
     exercises,
     userExercises,
     createSet,
-    createExercise,
+    createUserExercise,
     createOrGetExercise,
   };
 }
