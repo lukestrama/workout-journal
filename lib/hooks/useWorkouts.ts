@@ -126,9 +126,9 @@ export function useWorkout(workoutId: string) {
         name,
         workout_id: workout.id,
       });
-      // TODO: something here is not adding a new exercise to the exercises list
-      // if we already have the exercise in the list it adds to it another set
+
       setExercises((prev) => [...prev, { ...newExercise, sets: [] }]);
+      
       return newExercise;
     } catch (err) {
       setError(
@@ -160,7 +160,7 @@ export function useWorkout(workoutId: string) {
       loadUserExercises()
     }
   }, [user, loadUserExercises])
-  
+
   async function createSet(
     exercise: Exercise,
     setData: {

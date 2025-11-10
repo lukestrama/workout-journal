@@ -5,18 +5,36 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useWorkout } from "@/lib/hooks/useWorkouts";
 import CreatableSelect from "react-select/creatable";
+import { SingleValue, ActionMeta } from "react-select";
 
 const defaultWeight = 0;
 const defaultReps = 0;
 
 export default function WorkoutPage() {
   const { id } = useParams<{ id: string }>();
-  const { workout, exercises, userExercises, createSet, createOrGetExercise } =
+  const { workout, exercises, userExercises, createSet, createExercise, createOrGetExercise } =
     useWorkout(id);
 
   const [exerciseName, setExerciseName] = useState("");
   const [reps, setReps] = useState<number>(defaultWeight);
   const [weight, setWeight] = useState<number>(defaultReps);
+
+  const handleSetExerciseName = async (
+    option: SingleValue<{ value: string; label: string }>,
+    { action }: ActionMeta<{ value: string; label: string }>
+  ): Promise<void> => {
+    if (action === "create-option" && option?.value) {
+      try {
+        await createExercise(option.value)
+      } catch (err) {
+        console.log(err)
+      } finally {
+        setExerciseName(option?.value || "");
+      }
+    } else {
+      setExerciseName(option?.value || "");
+    }
+  };
 
   const addSet = async () => {
     if (!workout) return;
@@ -51,7 +69,7 @@ export default function WorkoutPage() {
             value: exercise.name,
             label: exercise.name,
           }))}
-          onChange={(e) => setExerciseName(e ? e.value : "")}
+          onChange={handleSetExerciseName}
         />
         <label>Weight</label>
         <input
