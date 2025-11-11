@@ -7,6 +7,11 @@ import { useWorkout } from "@/lib/hooks/useWorkouts";
 import CreatableSelect from "react-select/creatable";
 import { SingleValue, ActionMeta } from "react-select";
 import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const defaultWeight = 0;
 const defaultReps = 0;
@@ -20,12 +25,14 @@ export default function WorkoutPage() {
     createSet,
     createUserExercise,
     createOrGetExercise,
+    deleteSet,
   } = useWorkout(id);
 
   const [exerciseName, setExerciseName] = useState("");
   const [reps, setReps] = useState<number>(defaultWeight);
   const [weight, setWeight] = useState<number>(defaultReps);
   const [setAdditionLoading, setSetAdditionLoading] = useState(false);
+
   const handleSetExerciseName = async (
     option: SingleValue<{ value: string; label: string }>,
     { action }: ActionMeta<{ value: string; label: string }>
@@ -58,6 +65,10 @@ export default function WorkoutPage() {
     setReps(defaultReps);
   };
 
+  const handleSetDelete = async (setId: string) => {
+    await deleteSet(setId);
+  };
+
   return (
     <main className="p-6">
       {!workout ? (
@@ -67,7 +78,10 @@ export default function WorkoutPage() {
       ) : (
         <>
           <div className="grid grid-cols-[40px_1fr] mb-4">
-            <Link href="/" className="col-auto flex items-center justify-between">
+            <Link
+              href="/"
+              className="col-auto flex items-center justify-between"
+            >
               <i className="fa-solid fa-chevron-left text-2xl"></i>
             </Link>
             <h1 className="text-2xl font-bold">{workout.title}</h1>
@@ -143,12 +157,21 @@ export default function WorkoutPage() {
             {exercises.length
               ? exercises.map((ex) => (
                   <li key={ex.id}>
-                    {ex.name} -
+                    {ex.name} <span className="mr-2">-</span>
                     {ex.sets?.map((set, idx) => (
-                      <span key={set.id}>
-                        {idx > 0 ? ", " : " "}
-                        {set.weight ? set.weight : ""}x{set.reps}
-                      </span>
+                      <Popover key={set.id}>
+                        <PopoverTrigger asChild>
+                          <Button className="px-2" variant={"ghost"}>
+                            {idx > 0 ? ", " : " "}
+                            {set.weight ? set.weight : ""}x{set.reps}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                          <Button onClick={() => handleSetDelete(set.id)}>
+                            Delete
+                          </Button>
+                        </PopoverContent>
+                      </Popover>
                     ))}
                   </li>
                 ))

@@ -172,7 +172,6 @@ export const setsService = {
     supabase: SupabaseClient,
     set: Omit<ExerciseSet, "id" | "created_at" | "updated_at">
   ): Promise<ExerciseSet> {
-    console.log(set, "hejka");
     const { data, error } = await supabase
       .from("sets")
       .insert(set)
@@ -183,6 +182,21 @@ export const setsService = {
 
     return data;
   },
+  async deleteSet(
+    supabase: SupabaseClient,
+    setId: string
+  ): Promise<null> {
+    const { data, error } = await supabase
+      .from("sets")
+      .delete()
+      .eq('id', setId)
+
+    if (error) throw error;
+
+    return data;
+  },
+
+
 };
 
 export const workoutDataService = {
