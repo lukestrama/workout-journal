@@ -66,13 +66,13 @@ export default function WorkoutPage() {
         </div>
       ) : (
         <>
-          <div className="flex items-center mb-4 gap-2">
-            <Link href="/">
+          <div className="grid grid-cols-[40px_1fr] mb-4">
+            <Link href="/" className="col-auto flex items-center justify-between">
               <i className="fa-solid fa-chevron-left text-2xl"></i>
             </Link>
             <h1 className="text-2xl font-bold">{workout.title}</h1>
+            <h2 className="col-start-2 mb-4 text-lime-600">{workout.date}</h2>
           </div>
-          <h2 className="mb-4 text-lime-600">{workout.date}</h2>
 
           <div className="space-y-3 mb-6">
             <label>Exercise</label>
@@ -111,7 +111,9 @@ export default function WorkoutPage() {
                   onChange={(e) => setWeight(Number(e.target.value))}
                 />{" "}
               </div>
-              X
+              <div className="pb-2.5">
+                <i className="fa-solid fa-xmark"></i>
+              </div>
               <div>
                 <label>Reps</label>
                 <input
