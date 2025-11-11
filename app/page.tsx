@@ -7,13 +7,19 @@ import { Button } from "@/components/ui/button"
 import {
   Card,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 
 export default function HomePage() {
   const { user } = useUser()
-  const { workouts } = useWorkouts()
+  const { workouts, deleteWorkout } = useWorkouts()
+
+  const handleDeleteWorkout = (e: React.MouseEvent<HTMLButtonElement>, workoutId: string) => {
+    e.preventDefault()
+    deleteWorkout(workoutId)
+  }
 
   return (
     <main className="p-6">
@@ -42,6 +48,9 @@ export default function HomePage() {
                         <CardTitle>{w.title}</CardTitle>
                         <CardDescription>{w.date}</CardDescription>
                       </CardHeader>
+                      <CardFooter>
+                        <Button onClick={(e) => handleDeleteWorkout(e, w.id)}>Delete</Button>
+                      </CardFooter>
                     </Card>
                   </Link>
                 </li>
