@@ -6,14 +6,21 @@ import Link from "next/link";
 import { useWorkout } from "@/lib/hooks/useWorkouts";
 import CreatableSelect from "react-select/creatable";
 import { SingleValue, ActionMeta } from "react-select";
+import { Button } from "@/components/ui/button";
 
 const defaultWeight = 0;
 const defaultReps = 0;
 
 export default function WorkoutPage() {
   const { id } = useParams<{ id: string }>();
-  const { workout, exercises, userExercises, createSet, createUserExercise, createOrGetExercise } =
-    useWorkout(id);
+  const {
+    workout,
+    exercises,
+    userExercises,
+    createSet,
+    createUserExercise,
+    createOrGetExercise,
+  } = useWorkout(id);
 
   const [exerciseName, setExerciseName] = useState("");
   const [reps, setReps] = useState<number>(defaultWeight);
@@ -25,9 +32,9 @@ export default function WorkoutPage() {
   ): Promise<void> => {
     if (action === "create-option" && option?.value) {
       try {
-        await createUserExercise(option.value)
+        await createUserExercise(option.value);
       } catch (err) {
-        console.log(err)
+        console.log(err);
       } finally {
         setExerciseName(option?.value || "");
       }
@@ -70,29 +77,49 @@ export default function WorkoutPage() {
             label: exercise.name,
           }))}
           onChange={handleSetExerciseName}
+          classNames={{
+            menu: () => {
+              return "!bg-[#1A191A]";
+            },
+            option: (state) => {
+              return `!bg-[#1A191A] hover:!bg-lime-950 active:!bg-lime-950 active:!border-lime-800 active:!border-solid active:!border-1 ${
+                state.isSelected ? "!bg-lime-950" : ""
+              }`;
+            },
+            control: () => {
+              return "!bg-[#1A191A] hover:!border-white";
+            },
+            singleValue: () => {
+              return "!text-white";
+            },
+          }}
         />
-        <label>Weight</label>
-        <input
-          className="border p-2 w-full"
-          type="number"
-          placeholder="Weight (kg)"
-          value={weight}
-          onChange={(e) => setWeight(Number(e.target.value))}
-        />{" "}
-        X
-        <input
-          className="border p-2 w-full"
-          type="number"
-          placeholder="Reps"
-          value={reps}
-          onChange={(e) => setReps(Number(e.target.value))}
-        />
-        <button
-          onClick={addSet}
-          className="bg-green-600 text-white px-4 py-2 rounded"
-        >
+        <div className="flex items-end gap-4 mb-5">
+          <div>
+            <label>Weight</label>
+            <input
+              className="border p-2 w-full"
+              type="number"
+              placeholder="Weight (kg)"
+              value={weight}
+              onChange={(e) => setWeight(Number(e.target.value))}
+            />{" "}
+          </div>
+          X
+          <div>
+            <label>Reps</label>
+            <input
+              className="border p-2 w-full"
+              type="number"
+              placeholder="Reps"
+              value={reps}
+              onChange={(e) => setReps(Number(e.target.value))}
+            />
+          </div>
+        </div>
+        <Button onClick={addSet} className="w-full">
           Add Set
-        </button>
+        </Button>
       </div>
 
       <h3 className="font-bold mb-2">Exercises</h3>
@@ -104,7 +131,7 @@ export default function WorkoutPage() {
                 {ex.sets?.map((set, idx) => (
                   <span key={set.id}>
                     {idx > 0 ? ", " : " "}
-                    {set.weight}x{set.reps}
+                    {set.weight ? set.weight : ""}x{set.reps}
                   </span>
                 ))}
               </li>
