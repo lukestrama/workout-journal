@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import LoginButton from "./components/LoginButton";
 import { useUser } from "@clerk/nextjs";
 import { useWorkouts } from "@/lib/hooks/useWorkouts";
 import { Button } from "@/components/ui/button"
@@ -19,7 +18,7 @@ export default function HomePage() {
   return (
     <main className="p-6">
       {!user ? (
-        <LoginButton />
+        <></>
       ) : (
         <>
           <div className="flex justify-between items-center">
