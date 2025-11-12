@@ -44,6 +44,7 @@ export default function WorkoutPage() {
     createUserExercise,
     createOrGetExercise,
     deleteSet,
+    deleteExercise,
   } = useWorkout(id);
 
   const [exerciseName, setExerciseName] = useState("");
@@ -107,7 +108,6 @@ export default function WorkoutPage() {
               }))}
               onChange={handleSetExerciseName}
               classNames={selectStyles}
-              menuIsOpen={true}
             />
             <div className="flex items-end gap-4 mb-5">
               <div>
@@ -152,6 +152,7 @@ export default function WorkoutPage() {
             {exercises.length
               ? exercises.map((ex) => (
                   <ExerciseRow
+                    deleteExercise={deleteExercise}
                     deleteSet={deleteSet}
                     key={ex.id}
                     exercise={ex}

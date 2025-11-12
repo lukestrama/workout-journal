@@ -127,6 +127,20 @@ export const exerciseService = {
 
     return data;
   },
+
+  async deleteExercise(
+    supabase: SupabaseClient,
+    exerciseId: string
+  ): Promise<null> {
+    const { data, error } = await supabase
+      .from("exercises")
+      .delete()
+      .eq("id", exerciseId);
+
+    if (error) throw error;
+
+    return data;
+  },
 };
 
 // this service is responsible for adding exercises to a user's list of exercises. IE the list that they'll see in their drop down menu for exercises
@@ -182,21 +196,16 @@ export const setsService = {
 
     return data;
   },
-  async deleteSet(
-    supabase: SupabaseClient,
-    setId: string
-  ): Promise<null> {
+  async deleteSet(supabase: SupabaseClient, setId: string): Promise<null> {
     const { data, error } = await supabase
       .from("sets")
       .delete()
-      .eq('id', setId)
+      .eq("id", setId);
 
     if (error) throw error;
 
     return data;
   },
-
-
 };
 
 export const workoutDataService = {

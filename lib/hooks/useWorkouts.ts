@@ -219,9 +219,22 @@ export function useWorkout(workoutId: string) {
       setExercises((prev) => {
         return prev.map((exercise) => ({
           ...exercise,
-          sets: exercise.sets.filter((set) => set.id !== setId)
+          sets: exercise.sets.filter((set) => set.id !== setId),
         }));
-      })
+      });
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to delete the set."
+      );
+    }
+  }
+
+  async function deleteExercise(exerciseId: string) {
+    try {
+      await exerciseService.deleteExercise(supabase!, exerciseId);
+      setExercises((prev) => {
+        return prev.filter((exercise) => exercise.id !== exerciseId);
+      });
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to delete the set."
@@ -239,5 +252,6 @@ export function useWorkout(workoutId: string) {
     createUserExercise,
     createOrGetExercise,
     deleteSet,
+    deleteExercise,
   };
 }
