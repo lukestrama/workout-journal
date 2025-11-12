@@ -2,21 +2,37 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
 import { useWorkout } from "@/lib/hooks/useWorkouts";
 import CreatableSelect from "react-select/creatable";
 import { SingleValue, ActionMeta } from "react-select";
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import BackButton from "@/app/components/BackButton";
+import ExerciseRow from "@/app/components/exercises/ExerciseRow";
 
 const defaultWeight = 0;
 const defaultReps = 0;
+
+interface StateProperties {
+  isSelected: boolean;
+}
+
+const selectStyles = {
+  menu: () => {
+    return "!bg-[#1A191A]";
+  },
+  option: (state: StateProperties) => {
+    return `!bg-[#1A191A] hover:!bg-lime-950 active:!bg-lime-950 active:!border-lime-800 active:!border-solid active:!border-1 ${
+      state.isSelected ? "!bg-lime-950" : ""
+    }`;
+  },
+  control: () => {
+    return "!bg-[#1A191A] hover:!border-white";
+  },
+  singleValue: () => {
+    return "!text-white";
+  },
+};
 
 export default function WorkoutPage() {
   const { id } = useParams<{ id: string }>();
@@ -67,10 +83,6 @@ export default function WorkoutPage() {
     setReps(defaultReps);
   };
 
-  const handleSetDelete = async (setId: string) => {
-    await deleteSet(setId);
-  };
-
   return (
     <main className="p-6">
       {!workout ? (
@@ -94,22 +106,8 @@ export default function WorkoutPage() {
                 label: exercise.name,
               }))}
               onChange={handleSetExerciseName}
-              classNames={{
-                menu: () => {
-                  return "!bg-[#1A191A]";
-                },
-                option: (state) => {
-                  return `!bg-[#1A191A] hover:!bg-lime-950 active:!bg-lime-950 active:!border-lime-800 active:!border-solid active:!border-1 ${
-                    state.isSelected ? "!bg-lime-950" : ""
-                  }`;
-                },
-                control: () => {
-                  return "!bg-[#1A191A] hover:!border-white";
-                },
-                singleValue: () => {
-                  return "!text-white";
-                },
-              }}
+              classNames={selectStyles}
+              menuIsOpen={true}
             />
             <div className="flex items-end gap-4 mb-5">
               <div>
@@ -152,32 +150,13 @@ export default function WorkoutPage() {
           <h3 className="font-bold mb-2">Exercises</h3>
           <ul className="space-y-2">
             {exercises.length
-              ? exercises.map((ex) =>
-                  ex.sets.length ? (
-                    <li key={ex.id}>
-                      {ex.name} <span>-</span>
-                      {ex.sets?.map((set, idx) => (
-                        <>
-                          {idx > 0 ? ", " : " "}
-                          <Popover key={set.id}>
-                            <PopoverTrigger asChild>
-                              <Button className="px-2" variant={"ghost"}>
-                                {set.weight ? set.weight : ""}x{set.reps}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80">
-                              <Button onClick={() => handleSetDelete(set.id)}>
-                                Delete
-                              </Button>
-                            </PopoverContent>
-                          </Popover>
-                        </>
-                      ))}
-                    </li>
-                  ) : (
-                    ""
-                  )
-                )
+              ? exercises.map((ex) => (
+                  <ExerciseRow
+                    deleteSet={deleteSet}
+                    key={ex.id}
+                    exercise={ex}
+                  />
+                ))
               : ""}
           </ul>
         </>
