@@ -12,6 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Input } from "@/components/ui/input"
 
 const defaultWeight = 0;
 const defaultReps = 0;
@@ -117,7 +118,7 @@ export default function WorkoutPage() {
             <div className="flex items-end gap-4 mb-5">
               <div>
                 <label>Weight</label>
-                <input
+                <Input
                   className="border p-2 w-full"
                   type="number"
                   placeholder="Weight (kg)"
