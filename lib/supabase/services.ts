@@ -10,7 +10,7 @@ export const workoutService = {
       .from("workouts")
       .select("*")
       .eq("user_id", userId)
-      .order("created_at", { ascending: false });
+      .order("date", { ascending: false });
 
     if (error) throw error;
 

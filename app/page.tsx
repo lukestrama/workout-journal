@@ -3,23 +3,26 @@
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { useWorkouts } from "@/lib/hooks/useWorkouts";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 
 export default function HomePage() {
-  const { user } = useUser()
-  const { workouts, deleteWorkout } = useWorkouts()
+  const { user } = useUser();
+  const { workouts, deleteWorkout } = useWorkouts();
 
-  const handleDeleteWorkout = (e: React.MouseEvent<HTMLButtonElement>, workoutId: string) => {
-    e.preventDefault()
-    deleteWorkout(workoutId)
-  }
+  const handleDeleteWorkout = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    workoutId: string
+  ) => {
+    e.preventDefault();
+    deleteWorkout(workoutId);
+  };
 
   return (
     <main className="p-6">
@@ -30,11 +33,8 @@ export default function HomePage() {
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold">My Workouts</h1>
             <Button asChild>
-              <Link href="/add">
-                Add workout
-              </Link>
+              <Link href="/add">Add workout</Link>
             </Button>
-
           </div>
           {workouts.length === 0 ? (
             <p>No workouts yet. Add one!</p>
@@ -49,7 +49,9 @@ export default function HomePage() {
                         <CardDescription>{w.date}</CardDescription>
                       </CardHeader>
                       <CardFooter>
-                        <Button onClick={(e) => handleDeleteWorkout(e, w.id)}>Delete</Button>
+                        <Button onClick={(e) => handleDeleteWorkout(e, w.id)}>
+                          Delete
+                        </Button>
                       </CardFooter>
                     </Card>
                   </Link>
@@ -59,7 +61,6 @@ export default function HomePage() {
           )}
         </>
       )}
-
     </main>
   );
 }
