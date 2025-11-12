@@ -68,7 +68,7 @@ export function useWorkouts() {
 
     try {
       await workoutService.deleteWorkout(supabase!, workoutId);
-      setWorkouts((prev) => prev.filter((ex) => ex.id !== workoutId))
+      setWorkouts((prev) => prev.filter((ex) => ex.id !== workoutId));
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Failed to delete workout"
@@ -238,6 +238,6 @@ export function useWorkout(workoutId: string) {
     createSet,
     createUserExercise,
     createOrGetExercise,
-    deleteSet
+    deleteSet,
   };
 }

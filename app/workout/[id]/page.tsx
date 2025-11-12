@@ -12,7 +12,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Input } from "@/components/ui/input"
+import { Input } from "@/components/ui/input";
+import BackButton from "@/app/components/BackButton";
 
 const defaultWeight = 0;
 const defaultReps = 0;
@@ -79,12 +80,7 @@ export default function WorkoutPage() {
       ) : (
         <>
           <div className="grid grid-cols-[40px_1fr] mb-4">
-            <Link
-              href="/"
-              className="col-auto flex items-center justify-between"
-            >
-              <i className="fa-solid fa-chevron-left text-2xl"></i>
-            </Link>
+            <BackButton classNames="col-auto" />
             <h1 className="text-2xl font-bold">{workout.title}</h1>
             <h2 className="col-start-2 mb-4 text-lime-600">{workout.date}</h2>
           </div>
@@ -156,26 +152,32 @@ export default function WorkoutPage() {
           <h3 className="font-bold mb-2">Exercises</h3>
           <ul className="space-y-2">
             {exercises.length
-              ? exercises.map((ex) => (
-                  <li key={ex.id}>
-                    {ex.name} <span className="mr-2">-</span>
-                    {ex.sets?.map((set, idx) => (
-                      <Popover key={set.id}>
-                        <PopoverTrigger asChild>
-                          <Button className="px-2" variant={"ghost"}>
-                            {idx > 0 ? ", " : " "}
-                            {set.weight ? set.weight : ""}x{set.reps}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80">
-                          <Button onClick={() => handleSetDelete(set.id)}>
-                            Delete
-                          </Button>
-                        </PopoverContent>
-                      </Popover>
-                    ))}
-                  </li>
-                ))
+              ? exercises.map((ex) =>
+                  ex.sets.length ? (
+                    <li key={ex.id}>
+                      {ex.name} <span>-</span>
+                      {ex.sets?.map((set, idx) => (
+                        <>
+                          {idx > 0 ? ", " : " "}
+                          <Popover key={set.id}>
+                            <PopoverTrigger asChild>
+                              <Button className="px-2" variant={"ghost"}>
+                                {set.weight ? set.weight : ""}x{set.reps}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80">
+                              <Button onClick={() => handleSetDelete(set.id)}>
+                                Delete
+                              </Button>
+                            </PopoverContent>
+                          </Popover>
+                        </>
+                      ))}
+                    </li>
+                  ) : (
+                    ""
+                  )
+                )
               : ""}
           </ul>
         </>

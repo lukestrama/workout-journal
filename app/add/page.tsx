@@ -6,6 +6,7 @@ import { useWorkouts } from "@/lib/hooks/useWorkouts";
 import { Workout } from "@/lib/supabase/models";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input"
+import BackButton from "../components/BackButton";
 
 export default function AddWorkoutPage() {
   const router = useRouter();
@@ -25,7 +26,10 @@ export default function AddWorkoutPage() {
 
   return (
     <main className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Add New Workout</h1>
+      <div className="flex items-center gap-4 mb-4">
+        <BackButton />
+        <h1 className="text-2xl font-bold">Add New Workout</h1>
+      </div>
 
       <div className="space-y-4">
         <Input
