@@ -116,7 +116,7 @@ export default function WorkoutPage() {
                   className="border p-2 w-full"
                   type="number"
                   placeholder="Weight (kg)"
-                  value={weight}
+                  value={weight || ""}
                   onChange={(e) => setWeight(Number(e.target.value))}
                 />{" "}
               </div>
@@ -129,7 +129,7 @@ export default function WorkoutPage() {
                   className="border p-2 w-full"
                   type="number"
                   placeholder="Reps"
-                  value={reps}
+                  value={reps || ""}
                   onChange={(e) => setReps(Number(e.target.value))}
                 />
               </div>
