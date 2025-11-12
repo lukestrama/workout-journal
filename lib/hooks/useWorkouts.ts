@@ -125,7 +125,12 @@ export function useWorkout(workoutId: string) {
         workout_id: workout.id,
       });
 
-      setExercises((prev) => prev.map((ex) => ex));
+      setExercises((prev) => {
+        if (prev.findIndex((ex: Exercise) => ex.id === exercise.id) === -1) {
+          return [...prev.map((ex) => ex), exercise];
+        }
+        return prev;
+      });
 
       return exercise;
     } catch (err) {

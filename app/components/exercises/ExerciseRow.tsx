@@ -24,7 +24,7 @@ const ExerciseRow = ({
     await deleteExercise(exerciseId);
   };
 
-  return exercise.sets.length ? (
+  return (
     <li>
       <Popover>
         <PopoverTrigger asChild>
@@ -55,8 +55,6 @@ const ExerciseRow = ({
         </>
       ))}
     </li>
-  ) : (
-    ""
   );
 };
 

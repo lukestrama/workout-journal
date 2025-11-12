@@ -48,9 +48,28 @@ export default function WorkoutPage() {
   } = useWorkout(id);
 
   const [exerciseName, setExerciseName] = useState("");
-  const [reps, setReps] = useState<number>(defaultWeight);
-  const [weight, setWeight] = useState<number>(defaultReps);
-  const [setAdditionLoading, setSetAdditionLoading] = useState(false);
+  const [reps, setReps] = useState<number>(defaultReps);
+  const [weight, setWeight] = useState<number>(defaultWeight);
+  const [additionLoading, setAdditionLoading] = useState(false);
+
+  /**
+   * the idea here is that if we have an exercise that has already
+   * been added to the workout, we should be in addSetMode. If the
+   * exercise has not been added, then we should be in
+   * addExerciseMode. The add button is disabled if we're in ad set
+   * mode but don't have weights or reps, or in exercise mode and
+   * we don't have an exercise name selected
+   * TODO: Tests would be lovely here
+   */
+  const addSetMode =
+    !!exerciseName && exercises.find((ex) => ex.name == exerciseName);
+
+  const addExerciseMode = (!reps || !weight) && !addSetMode;
+
+  const addButtonDisabled =
+    (addSetMode && (!weight || !reps)) ||
+    (addExerciseMode && !exerciseName) ||
+    additionLoading;
 
   const handleSetExerciseName = async (
     option: SingleValue<{ value: string; label: string }>,
@@ -71,21 +90,37 @@ export default function WorkoutPage() {
 
   const addSet = async () => {
     if (!workout) return;
-    setSetAdditionLoading(true);
+    setAdditionLoading(true);
 
     const exercise = await createOrGetExercise(exerciseName);
 
     if (exercise) {
       await createSet(exercise, { reps, weight });
-      setSetAdditionLoading(false);
+      setAdditionLoading(false);
     }
 
     setWeight(defaultWeight);
     setReps(defaultReps);
   };
 
+  const addExercise = async () => {
+    await createOrGetExercise(exerciseName);
+  };
+
+  const handleAddClick = async () => {
+    if (addSetMode) return addSet();
+    if (addExerciseMode) return addExercise();
+  };
+
+  const addLabel = addSetMode ? "Add Set" : "Add Exercise";
+
   return (
     <main className="p-6">
+      {String(!!exerciseName)}
+      {String(exercises.every((ex) => ex.name !== exerciseName))}
+      {String(addExerciseMode)}
+      {String(addSetMode)}
+      {String(addButtonDisabled)}
       {!workout ? (
         <div className="flex items-center justify-center text-4xl">
           <i className="fa-solid fa-spinner fa-spin"></i>
@@ -109,8 +144,8 @@ export default function WorkoutPage() {
               onChange={handleSetExerciseName}
               classNames={selectStyles}
             />
-            <div className="flex items-end gap-4 mb-5">
-              <div>
+            <div className="flex items-end gap-4 mb-5 w-full">
+              <div className="flex-1">
                 <label>Weight</label>
                 <Input
                   className="border p-2 w-full"
@@ -120,12 +155,12 @@ export default function WorkoutPage() {
                   onChange={(e) => setWeight(Number(e.target.value))}
                 />{" "}
               </div>
-              <div className="pb-2.5">
+              <div className="pb-1">
                 <i className="fa-solid fa-xmark"></i>
               </div>
-              <div>
+              <div className="flex-1">
                 <label>Reps</label>
-                <input
+                <Input
                   className="border p-2 w-full"
                   type="number"
                   placeholder="Reps"
@@ -135,14 +170,14 @@ export default function WorkoutPage() {
               </div>
             </div>
             <Button
-              disabled={setAdditionLoading}
-              onClick={addSet}
+              disabled={addButtonDisabled}
+              onClick={handleAddClick}
               className="w-full"
             >
-              {setAdditionLoading ? (
+              {additionLoading ? (
                 <i className="fa-solid fa-spinner fa-spin"></i>
               ) : (
-                "Add Set"
+                <span>{addLabel}</span>
               )}
             </Button>
           </div>
