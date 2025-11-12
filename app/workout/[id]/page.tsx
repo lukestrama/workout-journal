@@ -116,11 +116,6 @@ export default function WorkoutPage() {
 
   return (
     <main className="p-6">
-      {String(!!exerciseName)}
-      {String(exercises.every((ex) => ex.name !== exerciseName))}
-      {String(addExerciseMode)}
-      {String(addSetMode)}
-      {String(addButtonDisabled)}
       {!workout ? (
         <div className="flex items-center justify-center text-4xl">
           <i className="fa-solid fa-spinner fa-spin"></i>
