@@ -5,31 +5,27 @@ import { useRouter } from "next/navigation";
 import { useWorkouts } from "@/lib/hooks/useWorkouts";
 import { Workout } from "@/lib/supabase/models";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"
-import BackButton from "../components/BackButton";
+import { Input } from "@/components/ui/input";
+import { Header } from "../components/Header";
 
 export default function AddWorkoutPage() {
   const router = useRouter();
-  const { createWorkout } = useWorkouts()
+  const { createWorkout } = useWorkouts();
 
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
-  const [loading, setLoading] = useState(false)
-
+  const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
-    setLoading(true)
-    const workout: Workout | undefined = await createWorkout(title, date)
-    if (workout) router.push(`/workout/${workout.id}`)
-      setLoading(false)
+    setLoading(true);
+    const workout: Workout | undefined = await createWorkout(title, date);
+    if (workout) router.push(`/workout/${workout.id}`);
+    setLoading(false);
   };
 
   return (
     <main className="p-6">
-      <div className="flex items-center gap-4 mb-4">
-        <BackButton />
-        <h1 className="text-2xl font-bold">Add New Workout</h1>
-      </div>
+      <Header title="Add New Workout" />
 
       <div className="space-y-4">
         <Input
@@ -44,10 +40,7 @@ export default function AddWorkoutPage() {
           value={date}
           onChange={(e) => setDate(e.target.value)}
         />
-        <Button
-          onClick={handleSave}
-          disabled={loading}
-        >
+        <Button onClick={handleSave} disabled={loading}>
           Save Workout
         </Button>
       </div>

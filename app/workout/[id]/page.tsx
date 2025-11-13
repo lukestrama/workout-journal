@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BackButton from "@/app/components/BackButton";
 import ExerciseRow from "@/app/components/exercises/ExerciseRow";
+import { Header } from "@/app/components/Header";
 
 const defaultWeight = 0;
 const defaultReps = 0;
@@ -122,11 +123,7 @@ export default function WorkoutPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-[40px_1fr] mb-4">
-            <BackButton classNames="col-auto" />
-            <h1 className="text-2xl font-bold">{workout.title}</h1>
-            <h2 className="col-start-2 mb-4 text-lime-600">{workout.date}</h2>
-          </div>
+          <Header title={workout.title} subtitle={workout.date} />
 
           <div className="space-y-3 mb-6">
             <label>Exercise</label>

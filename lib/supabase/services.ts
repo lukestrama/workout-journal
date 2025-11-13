@@ -141,6 +141,23 @@ export const exerciseService = {
 
     return data;
   },
+
+  async getLastExercisesByName(
+    supabase: SupabaseClient,
+    exerciseName: string,
+    limit: number = 5
+  ): Promise<Exercise[]> {
+    const { data, error } = await supabase
+      .from("exercise_history_grouped")
+      .select("*")
+      .eq("exercise_name", exerciseName)
+      .order("workout_date", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+
+    return data;
+  },
 };
 
 // this service is responsible for adding exercises to a user's list of exercises. IE the list that they'll see in their drop down menu for exercises

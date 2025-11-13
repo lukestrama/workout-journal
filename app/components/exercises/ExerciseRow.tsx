@@ -5,6 +5,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { useExercise } from "@/lib/hooks/useExercise";
 
 interface ExerciseRowProps {
   exercise: Exercise;
@@ -16,6 +17,8 @@ const ExerciseRow = ({
   deleteSet,
   deleteExercise,
 }: ExerciseRowProps) => {
+  const { exercises } = useExercise(exercise);
+
   const handleSetDelete = async (setId: string) => {
     await deleteSet(setId);
   };
@@ -33,6 +36,17 @@ const ExerciseRow = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-80">
+          {exercises.map((ex: Exercise) => (
+            <p key={ex.id}>
+              {ex.workout_date} -
+              {ex.sets?.map((set, idx) => (
+                <span key={set.id}>
+                  {idx > 0 ? ", " : " "}
+                  {set.weight}x{set.reps}
+                </span>
+              ))}
+            </p>
+          ))}
           <Button onClick={() => handleExerciseDelete(exercise.id)}>
             Delete
           </Button>
@@ -40,7 +54,7 @@ const ExerciseRow = ({
       </Popover>
       <span>-</span>
       {exercise.sets?.map((set, idx) => (
-        <>
+        <span key={set.id}>
           {idx > 0 ? ", " : " "}
           <Popover key={set.id}>
             <PopoverTrigger asChild>
@@ -52,7 +66,7 @@ const ExerciseRow = ({
               <Button onClick={() => handleSetDelete(set.id)}>Delete</Button>
             </PopoverContent>
           </Popover>
-        </>
+        </span>
       ))}
     </li>
   );
