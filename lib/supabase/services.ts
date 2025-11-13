@@ -152,7 +152,8 @@ export const exerciseService = {
       .select("*")
       .eq("exercise_name", exerciseName)
       .order("workout_date", { ascending: false })
-      .limit(limit);
+      .limit(limit)
+      .range(1, 6);
 
     if (error) throw error;
 

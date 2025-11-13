@@ -41,7 +41,7 @@ const ExerciseRow = ({
           side="top"
           className="w-80"
         >
-          <p className="text-lg">Lastest workouts</p>
+          <p className="text-lg">Previous workouts</p>
           {exercises.map((ex: Exercise) => (
             <p key={ex.id}>
               {ex.workout_date} -
@@ -70,7 +70,7 @@ const ExerciseRow = ({
           {idx > 0 ? ", " : " "}
           <Popover key={set.id}>
             <PopoverTrigger asChild>
-              <Button className="px-2" variant={"ghost"}>
+              <Button className="px-0.5 py-0 h-6 items-end" variant={"ghost"}>
                 {set.weight ? set.weight : ""}x{set.reps}
               </Button>
             </PopoverTrigger>

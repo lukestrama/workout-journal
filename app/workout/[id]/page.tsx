@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import ExerciseRow from "@/app/components/exercises/ExerciseRow";
 import { Header } from "@/app/components/Header";
 import Spinner from "@/app/components/Spinner";
+import getAddMode from "./utils/getAddMode";
+import { ADD_MODES } from "@/lib/constants";
 
 const defaultWeight = 0;
 const defaultReps = 0;
@@ -57,18 +59,16 @@ export default function WorkoutPage() {
    * the idea here is that if we have an exercise that has already
    * been added to the workout, we should be in addSetMode. If the
    * exercise has not been added, then we should be in
-   * addExerciseMode. The add button is disabled if we're in ad set
-   * mode but don't have weights or reps, or in exercise mode and
+   * addExerciseMode. The add button is disabled if we're in add set
+   * mode but don't have reps, or in exercise mode and
    * we don't have an exercise name selected
-   * TODO: Tests would be lovely here
    */
-  const addSetMode =
-    !!exerciseName && exercises.find((ex) => ex.name == exerciseName);
-
-  const addExerciseMode = (!reps || !weight) && !addSetMode;
+  const currentMode = getAddMode(exercises, exerciseName, reps);
+  const addSetMode = currentMode === ADD_MODES.set;
+  const addExerciseMode = currentMode === ADD_MODES.exercise;
 
   const addButtonDisabled =
-    (addSetMode && (!weight || !reps)) ||
+    (addSetMode && !reps) ||
     (addExerciseMode && !exerciseName) ||
     additionLoading;
 

@@ -1,5 +1,4 @@
 import { useSupabase } from "../supabase/SupabaseProvider";
-import { useUser } from "@clerk/nextjs";
 import { exerciseService } from "../supabase/services";
 import { useCallback, useState, useEffect } from "react";
 import { Exercise } from "../supabase/models";

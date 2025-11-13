@@ -55,7 +55,10 @@ export default function HomePage() {
                         <CardDescription>{w.date}</CardDescription>
                       </CardHeader>
                       <CardFooter>
-                        <Button onClick={(e) => handleDeleteWorkout(e, w.id)}>
+                        <Button
+                          onClick={(e) => handleDeleteWorkout(e, w.id)}
+                          variant={"destructive"}
+                        >
                           Delete
                         </Button>
                       </CardFooter>

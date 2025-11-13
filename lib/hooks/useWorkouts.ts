@@ -203,7 +203,8 @@ export function useWorkout(workoutId: string) {
         }
         return prev.map((ex) => {
           if (ex.id === exercise.id) {
-            return { ...ex, sets: [...ex.sets, newSet] };
+            const sets = ex.sets?.length ? [...ex.sets, newSet] : [newSet];
+            return { ...ex, sets };
           } else {
             return ex;
           }
