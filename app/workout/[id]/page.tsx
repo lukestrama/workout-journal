@@ -7,7 +7,6 @@ import CreatableSelect from "react-select/creatable";
 import { SingleValue, ActionMeta } from "react-select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import BackButton from "@/app/components/BackButton";
 import ExerciseRow from "@/app/components/exercises/ExerciseRow";
 import { Header } from "@/app/components/Header";
 
