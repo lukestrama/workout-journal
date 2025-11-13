@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ExerciseRow from "@/app/components/exercises/ExerciseRow";
 import { Header } from "@/app/components/Header";
+import Spinner from "@/app/components/Spinner";
 
 const defaultWeight = 0;
 const defaultReps = 0;
@@ -118,7 +119,7 @@ export default function WorkoutPage() {
     <main className="p-6">
       {!workout ? (
         <div className="flex items-center justify-center text-4xl">
-          <i className="fa-solid fa-spinner fa-spin"></i>
+          <Spinner />
         </div>
       ) : (
         <>

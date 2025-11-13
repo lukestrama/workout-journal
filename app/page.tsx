@@ -11,10 +11,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Spinner from "./components/Spinner";
 
 export default function HomePage() {
   const { user } = useUser();
-  const { workouts, deleteWorkout } = useWorkouts();
+  const { workouts, deleteWorkout, loading } = useWorkouts();
 
   const handleDeleteWorkout = (
     e: React.MouseEvent<HTMLButtonElement>,
@@ -36,8 +37,13 @@ export default function HomePage() {
               <Link href="/add">Add workout</Link>
             </Button>
           </div>
+          {/* TODO: Deal with flicker here. No workouts shows first before spinner */}
           {workouts.length === 0 ? (
-            <p>No workouts yet. Add one!</p>
+            loading ? (
+              <Spinner />
+            ) : (
+              <p>No workouts yet. Add one!</p>
+            )
           ) : (
             <ul className="space-y-2">
               {workouts.map((w) => (

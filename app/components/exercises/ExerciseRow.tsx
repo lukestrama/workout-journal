@@ -35,21 +35,33 @@ const ExerciseRow = ({
             {exercise.name}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-80">
+        <PopoverContent
+          align="end"
+          alignOffset={50}
+          side="top"
+          className="w-80"
+        >
+          <p className="text-lg">Lastest workouts</p>
           {exercises.map((ex: Exercise) => (
             <p key={ex.id}>
               {ex.workout_date} -
               {ex.sets?.map((set, idx) => (
                 <span key={set.id}>
                   {idx > 0 ? ", " : " "}
-                  {set.weight}x{set.reps}
+                  {set.weight ? set.weight : ""}x{set.reps}
                 </span>
               ))}
             </p>
           ))}
-          <Button onClick={() => handleExerciseDelete(exercise.id)}>
-            Delete
-          </Button>
+          <div className="w-full flex">
+            <Button
+              variant={"destructive"}
+              className="mt-2 w-full"
+              onClick={() => handleExerciseDelete(exercise.id)}
+            >
+              Delete
+            </Button>
+          </div>
         </PopoverContent>
       </Popover>
       <span>-</span>
@@ -62,8 +74,13 @@ const ExerciseRow = ({
                 {set.weight ? set.weight : ""}x{set.reps}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <Button onClick={() => handleSetDelete(set.id)}>Delete</Button>
+            <PopoverContent side="top" className="w-auto">
+              <Button
+                onClick={() => handleSetDelete(set.id)}
+                variant={"destructive"}
+              >
+                Delete
+              </Button>
             </PopoverContent>
           </Popover>
         </span>
