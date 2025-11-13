@@ -248,6 +248,16 @@ export function useWorkout(workoutId: string) {
     }
   }
 
+  async function updateNotes(workoutId: string, notes: string) {
+    try {
+      await workoutService.updateWorkoutNotes(supabase!, workoutId, notes);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to delete the set."
+      );
+    }
+  }
+
   return {
     workout,
     loading,
@@ -259,5 +269,6 @@ export function useWorkout(workoutId: string) {
     createOrGetExercise,
     deleteSet,
     deleteExercise,
+    updateNotes,
   };
 }

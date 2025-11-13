@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { useWorkout } from "@/lib/hooks/useWorkouts";
 import CreatableSelect from "react-select/creatable";
@@ -12,6 +12,7 @@ import { Header } from "@/app/components/Header";
 import Spinner from "@/app/components/Spinner";
 import getAddMode from "./utils/getAddMode";
 import { ADD_MODES } from "@/lib/constants";
+import { Textarea } from "@/components/ui/textarea";
 
 const defaultWeight = 0;
 const defaultReps = 0;
@@ -48,13 +49,15 @@ export default function WorkoutPage() {
     createOrGetExercise,
     deleteSet,
     deleteExercise,
+    updateNotes,
   } = useWorkout(id);
 
   const [exerciseName, setExerciseName] = useState("");
   const [reps, setReps] = useState<number>(defaultReps);
   const [weight, setWeight] = useState<number>(defaultWeight);
   const [additionLoading, setAdditionLoading] = useState(false);
-
+  const [notes, setNotes] = useState("");
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   /**
    * the idea here is that if we have an exercise that has already
    * been added to the workout, we should be in addSetMode. If the
@@ -113,7 +116,38 @@ export default function WorkoutPage() {
     if (addExerciseMode) return addExercise();
   };
 
+  const handleNotesInput = async (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setNotes(e.currentTarget.value);
+  };
+
   const addLabel = addSetMode ? "Add Set" : "Add Exercise";
+
+  useEffect(() => {
+    if (!id) return;
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(() => {
+      if (notes) {
+        updateNotes(id, notes);
+      }
+    }, 1000);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [notes, updateNotes, id]);
+
+  useEffect(() => {
+    if (workout?.notes !== undefined) {
+      setNotes(workout.notes);
+    }
+  }, [workout?.notes]);
 
   return (
     <main className="p-6">
@@ -187,6 +221,13 @@ export default function WorkoutPage() {
                 ))
               : ""}
           </ul>
+          <p className="mt-4 mb-2">Notes</p>
+          <Textarea
+            className="w-full p-2"
+            rows={3}
+            value={notes}
+            onChange={(e) => handleNotesInput(e)}
+          />
         </>
       )}
     </main>

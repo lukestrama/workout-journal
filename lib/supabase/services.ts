@@ -60,6 +60,21 @@ export const workoutService = {
 
     return data;
   },
+
+  async updateWorkoutNotes(
+    supabase: SupabaseClient,
+    workoutId: string,
+    notes: string
+  ): Promise<null> {
+    const { data, error } = await supabase
+      .from("workouts")
+      .update({ notes })
+      .eq("id", workoutId);
+
+    if (error) throw error;
+
+    return data;
+  },
 };
 
 export const exerciseService = {

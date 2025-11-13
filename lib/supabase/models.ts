@@ -20,6 +20,7 @@ export interface Workout {
   date: string;
   exercises: Exercise[];
   user_id: string;
+  notes?: string;
 }
 
 export interface UserExercise {
