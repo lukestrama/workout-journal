@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -50,18 +49,18 @@ export default function HomePage() {
                 <li key={w.id} className="my-4">
                   <Link href={`/workout/${w.id}`} className="text-lg">
                     <Card>
-                      <CardHeader>
-                        <CardTitle>{w.title}</CardTitle>
-                        <CardDescription>{w.date}</CardDescription>
-                      </CardHeader>
-                      <CardFooter>
+                      <CardHeader className="flex justify-between">
+                        <div>
+                          <CardTitle>{w.title}</CardTitle>
+                          <CardDescription>{w.date}</CardDescription>
+                        </div>
                         <Button
                           onClick={(e) => handleDeleteWorkout(e, w.id)}
                           variant={"destructive"}
                         >
                           Delete
                         </Button>
-                      </CardFooter>
+                      </CardHeader>
                     </Card>
                   </Link>
                 </li>
