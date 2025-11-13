@@ -5,7 +5,7 @@ export const Header = ({
   subtitle,
 }: {
   title: string;
-  subtitle: string;
+  subtitle?: string;
 }) => {
   return (
     <div className="flex items-center gap-4 mb-4">
