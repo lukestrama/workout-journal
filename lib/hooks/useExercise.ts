@@ -1,34 +1,49 @@
 import { useSupabase } from "../supabase/SupabaseProvider";
 import { exerciseService } from "../supabase/services";
-import { useCallback, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Exercise } from "../supabase/models";
+import { useUser } from "@clerk/nextjs";
 
 export function useExercise(exercise: Exercise) {
   const { supabase } = useSupabase();
+  const { user } = useUser();
   const [error, setError] = useState<string | null>("");
-  const [exercises, setExercises] = useState<Exercise[]>([]);
-
-  const getLastExercises = useCallback(async () => {
-    if (!exercise) return;
-    try {
-      const workouts = await exerciseService.getLastExercisesByName(
-        supabase!,
-        exercise.name
-      );
-
-      setExercises(workouts);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to retrieve the exercises."
-      );
-    }
-  }, [exercise, supabase]);
+  const [lastExercises, setLastExercises] = useState<Exercise[]>([]);
 
   useEffect(() => {
-    if (exercise) {
-      getLastExercises();
-    }
-  }, [exercise, getLastExercises, supabase]);
+    if (!exercise || !supabase || !user) return;
 
-  return { exercises, error };
+    let isCancelled = false;
+
+    const fetchExercises = async () => {
+      try {
+        const workouts = await exerciseService.getLastExercisesByName(
+          supabase,
+          exercise.name,
+          user.id
+        );
+
+        if (!isCancelled) {
+          setLastExercises(workouts);
+          setError(null);
+        }
+      } catch (err) {
+        if (!isCancelled) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Failed to retrieve the exercises."
+          );
+        }
+      }
+    };
+
+    fetchExercises();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [exercise, supabase, user]);
+
+  return { lastExercises, error };
 }

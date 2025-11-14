@@ -17,7 +17,7 @@ const ExerciseRow = ({
   deleteSet,
   deleteExercise,
 }: ExerciseRowProps) => {
-  const { exercises } = useExercise(exercise);
+  const { lastExercises } = useExercise(exercise);
 
   const handleSetDelete = async (setId: string) => {
     await deleteSet(setId);
@@ -41,8 +41,12 @@ const ExerciseRow = ({
           side="top"
           className="w-80"
         >
-          <p className="text-lg">Previous workouts</p>
-          {exercises.map((ex: Exercise) => (
+          {lastExercises.length ? (
+            <p className="text-lg">Previous workouts</p>
+          ) : (
+            ""
+          )}
+          {lastExercises.map((ex: Exercise) => (
             <p key={ex.id}>
               {ex.workout_date} -
               {ex.sets?.map((set, idx) => (

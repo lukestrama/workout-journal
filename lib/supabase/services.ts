@@ -160,15 +160,17 @@ export const exerciseService = {
   async getLastExercisesByName(
     supabase: SupabaseClient,
     exerciseName: string,
+    userId: string,
     limit: number = 5
   ): Promise<Exercise[]> {
     const { data, error } = await supabase
       .from("exercise_history_grouped")
       .select("*")
       .eq("exercise_name", exerciseName)
+      .eq("user_id", userId)
       .order("workout_date", { ascending: false })
       .limit(limit)
-      .range(1, 6);
+      .range(1, 1 + limit);
 
     if (error) throw error;
 

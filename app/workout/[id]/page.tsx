@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { useWorkout } from "@/lib/hooks/useWorkouts";
+import { useWorkout } from "@/lib/hooks/useWorkout";
 import CreatableSelect from "react-select/creatable";
 import { SingleValue, ActionMeta } from "react-select";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,7 @@ const selectStyles = {
     }`;
   },
   control: () => {
-    return "!bg-[#1A191A] hover:!border-white";
+    return "!bg-[#1A191A] hover:!border-white !rounded-md";
   },
   singleValue: () => {
     return "!text-white";
