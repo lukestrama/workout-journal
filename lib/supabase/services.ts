@@ -34,7 +34,7 @@ export const workoutService = {
 
   async createWorkout(
     supabase: SupabaseClient,
-    workout: Omit<Workout, "id" | "created_at" | "exercises">
+    workout: Omit<Workout, "id" | "created_at" | "exercises" | "user_id">
   ): Promise<Workout> {
     const { data, error } = await supabase
       .from("workouts")
@@ -74,6 +74,53 @@ export const workoutService = {
     if (error) throw error;
 
     return data;
+  },
+
+  async saveWorkoutWithExercisesAndSets(
+    supabase: SupabaseClient,
+    workout: Omit<Workout, "id" | "created_at" | "exercises" | "user_id">,
+    exercises: Omit<Exercise, "id" | "created_at" | "workout_id">[]
+  ) {
+    const workoutRow = await this.createWorkout(supabase!, workout);
+
+    const exerciseInsertPayload = exercises.map((ex) => ({
+      name: ex.name,
+      workout_id: workoutRow.id,
+      date: workoutRow.date,
+    }));
+
+    const { data: exerciseRows, error: exerciseError } = await supabase
+      .from("exercises")
+      .insert(exerciseInsertPayload)
+      .select();
+
+    const allSets: ExerciseSet[] = [];
+    if (exerciseRows) {
+      for (const row of exerciseRows) {
+        const exercise = exercises.find((ex) => ex.name === row.name);
+
+        exercise?.sets.forEach((set) => {
+          allSets.push({
+            weight: set.weight,
+            reps: set.reps,
+            exercise_id: row.id,
+          });
+        });
+      }
+    }
+
+    if (exerciseError) throw exerciseError;
+
+    if (allSets.length > 0) {
+      const { error: setError } = await supabase.from("sets").insert(allSets);
+
+      if (setError) throw setError;
+    }
+    return {
+      workout: workoutRow,
+      exercises: exerciseRows,
+      setsInserted: allSets.length,
+    };
   },
 };
 

@@ -11,9 +11,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Spinner from "./components/Spinner";
+import { workoutService } from "@/lib/supabase/services";
+import { useSupabase } from "@/lib/supabase/SupabaseProvider";
 
 export default function HomePage() {
   const { user } = useUser();
+  const { supabase } = useSupabase();
   const { workouts, deleteWorkout, loading } = useWorkouts();
 
   const handleDeleteWorkout = (
@@ -24,12 +27,50 @@ export default function HomePage() {
     deleteWorkout(workoutId);
   };
 
+  const handleAddNewDummyWorkout = () => {
+    workoutService.saveWorkoutWithExercisesAndSets(
+      supabase!,
+      {
+        date: "11-15-2025",
+        title: "Here we go",
+        user_id: user.id,
+      },
+      [
+        {
+          name: "A",
+          sets: [
+            { reps: 5, weight: 6 },
+            { reps: 5, weight: 6 },
+            { reps: 5, weight: 6 },
+          ],
+        },
+        {
+          name: "B",
+          sets: [
+            { reps: 5, weight: 6 },
+            { reps: 5, weight: 6 },
+            { reps: 5, weight: 6 },
+          ],
+        },
+        {
+          name: "C",
+          sets: [
+            { reps: 5, weight: 6 },
+            { reps: 5, weight: 6 },
+            { reps: 5, weight: 6 },
+          ],
+        },
+      ]
+    );
+  };
+
   return (
     <main className="p-6">
       {!user ? (
         <></>
       ) : (
         <>
+          <button onClick={handleAddNewDummyWorkout}>Here we go</button>
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold">My Workouts</h1>
             <Button asChild>
