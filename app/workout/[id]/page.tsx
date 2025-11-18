@@ -227,17 +227,26 @@ export default function WorkoutPage() {
       ) : (
         <>
           <Header title={workout.title} subtitle={workout.date} />
-          <div className="flex justify-end">
+          <div className="flex w-full my-4 md:justify-end gap-2">
             {isSaved ? (
-              <Link href="/">Back to workouts</Link>
+              <Button className="flex-1" variant={"secondary"} asChild>
+                <Link href="/">Back to workouts</Link>
+              </Button>
             ) : (
               <Dialog>
-                <DialogTrigger>Back to workouts</DialogTrigger>
-                <DialogContent>
+                <Button className="flex-1" variant={"secondary"} asChild>
+                  <DialogTrigger>Back to workouts</DialogTrigger>
+                </Button>
+                <DialogContent className="text-center w-80">
                   <DialogHeader>
-                    <DialogTitle>You have unsaved changes</DialogTitle>
-                    <DialogDescription>
-                      <Button onClick={handleBackToWorkouts}>
+                    <DialogTitle className="text-center">
+                      You have unsaved changes
+                    </DialogTitle>
+                    <DialogDescription className="flex gap-2 justify-center">
+                      <Button
+                        variant={"destructive"}
+                        onClick={handleBackToWorkouts}
+                      >
                         Discard changes
                       </Button>
                       <Button onClick={handleSaveWorkoutAndRedirect}>
@@ -250,7 +259,7 @@ export default function WorkoutPage() {
             )}
 
             <Button
-              className="w-40"
+              className="flex-1"
               disabled={isSaving}
               onClick={handleSaveWorkout}
             >
