@@ -6,7 +6,7 @@ import {
   userExercisesService,
 } from "../supabase/services";
 import { useUser } from "@clerk/nextjs";
-import { Exercise, hasTempId, UserExercise, Workout } from "../supabase/models";
+import { Exercise, UserExercise, Workout } from "../supabase/models";
 import { useEffect, useState, useCallback } from "react";
 import { useSupabase } from "../supabase/SupabaseProvider";
 
@@ -130,7 +130,7 @@ export function useWorkout(workoutId: string) {
     }
   }
   async function createSet(
-    exercise: Exercise & hasTempId,
+    exercise: Exercise,
     setData: {
       reps: number;
       weight: number;

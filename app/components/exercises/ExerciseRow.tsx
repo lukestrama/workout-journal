@@ -1,4 +1,4 @@
-import { Exercise } from "@/lib/supabase/models";
+import { Exercise, ExerciseSet } from "@/lib/supabase/models";
 import {
   Popover,
   PopoverContent,
@@ -10,21 +10,33 @@ import { useExercise } from "@/lib/hooks/useExercise";
 interface ExerciseRowProps {
   exercise: Exercise;
   deleteSet: (setId: string) => void;
+  removeLocalSet: (setId: string) => void;
+  removeLocalExercise: (exerciseId: string) => void;
   deleteExercise: (exerciseId: string) => void;
 }
 const ExerciseRow = ({
   exercise,
   deleteSet,
   deleteExercise,
+  removeLocalSet,
+  removeLocalExercise,
 }: ExerciseRowProps) => {
   const { lastExercises } = useExercise(exercise);
 
-  const handleSetDelete = async (setId: string) => {
-    await deleteSet(setId);
+  const handleSetDelete = async (set: ExerciseSet) => {
+    if (set.id) {
+      await deleteSet(set.id);
+    } else if (set.temporaryId) {
+      removeLocalSet(set.temporaryId);
+    }
   };
 
-  const handleExerciseDelete = async (exerciseId: string) => {
-    await deleteExercise(exerciseId);
+  const handleExerciseDelete = async (exercise: Exercise) => {
+    if (exercise.id) {
+      await deleteExercise(exercise.id);
+    } else if (exercise.temporaryId) {
+      removeLocalExercise(exercise.temporaryId);
+    }
   };
 
   return (
@@ -61,7 +73,7 @@ const ExerciseRow = ({
             <Button
               variant={"destructive"}
               className="mt-2 w-full"
-              onClick={() => handleExerciseDelete(exercise.id)}
+              onClick={() => handleExerciseDelete(exercise)}
             >
               Delete
             </Button>
@@ -70,7 +82,7 @@ const ExerciseRow = ({
       </Popover>
       <span>-</span>
       {exercise.sets?.map((set, idx) => (
-        <span key={set.id}>
+        <span key={set.id || set.temporaryId}>
           {idx > 0 ? ", " : " "}
           <Popover key={set.id}>
             <PopoverTrigger asChild>
@@ -80,7 +92,7 @@ const ExerciseRow = ({
             </PopoverTrigger>
             <PopoverContent side="top" className="w-auto">
               <Button
-                onClick={() => handleSetDelete(set.id)}
+                onClick={() => handleSetDelete(set)}
                 variant={"destructive"}
               >
                 Delete

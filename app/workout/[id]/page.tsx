@@ -23,6 +23,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { genRandomInt } from "@/lib/utils";
 
 const defaultWeight = 0;
 const defaultReps = 0;
@@ -104,7 +105,14 @@ export default function WorkoutPage() {
   };
 
   const addSet = async () => {
-    const newSet = { weight, reps, id: null, exercise_id: "" };
+    const newSet = {
+      weight,
+      reps,
+      id: null,
+      exercise_id: "",
+      temporaryId: genRandomInt(),
+    };
+
     setExercises((prev) => {
       if (prev.find((ex) => ex.name === exerciseName)) {
         return prev.map((ex) => {
@@ -121,7 +129,7 @@ export default function WorkoutPage() {
           name: exerciseName,
           sets: [newSet],
           workout_id: id,
-          temporaryId: Math.random().toString(10).substring(2, 8),
+          temporaryId: genRandomInt(),
         },
       ];
     });
@@ -138,7 +146,7 @@ export default function WorkoutPage() {
           name: exerciseName,
           sets: [],
           workout_id: id,
-          temporaryId: Math.random().toString(10).substring(2, 8),
+          temporaryId: genRandomInt(),
         },
       ];
     });
@@ -171,6 +179,25 @@ export default function WorkoutPage() {
     } else {
       router.push("/");
     }
+  };
+
+  const handleLocalSetDelete = (setId: string) => {
+    setExercises((prev) => {
+      return prev
+        .map((exercise) => ({
+          ...exercise,
+          sets: exercise.sets.filter((set) => set.temporaryId !== setId),
+        }))
+        .filter((exercise) => exercise.sets.length > 0);
+    });
+    setIsSaved(false);
+  };
+
+  const handleLocalExerciseDelete = (exerciseId: string) => {
+    setExercises((prev) => {
+      return prev.filter((exercise) => exercise.temporaryId !== exerciseId);
+    });
+    setIsSaved(false);
   };
 
   const handleSaveWorkoutAndRedirect = () => {
@@ -316,9 +343,11 @@ export default function WorkoutPage() {
             {exercises.length
               ? exercises.map((ex) => (
                   <ExerciseRow
+                    removeLocalSet={handleLocalSetDelete}
+                    removeLocalExercise={handleLocalExerciseDelete}
                     deleteExercise={deleteExercise}
                     deleteSet={deleteSet}
-                    key={ex.id}
+                    key={ex.id || ex.temporaryId}
                     exercise={ex}
                   />
                 ))

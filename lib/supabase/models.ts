@@ -1,11 +1,10 @@
-import { UUIDTypes } from "uuid";
-
 export interface ExerciseSet {
   weight: number;
   reps: number;
   exercise_id: string;
   notes?: string;
   id: string | null;
+  temporaryId?: string;
 }
 
 export interface Exercise {
@@ -14,6 +13,7 @@ export interface Exercise {
   sets: ExerciseSet[];
   workout_id: string;
   workout_date?: string;
+  temporaryId?: string;
 }
 
 export interface Workout {
@@ -29,8 +29,4 @@ export interface UserExercise {
   id: string;
   name: string;
   user_id: string;
-}
-
-export interface hasTempId {
-  temporaryId?: string;
 }
