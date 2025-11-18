@@ -44,18 +44,18 @@ export default function WorkoutPage() {
     workout,
     exercises,
     userExercises,
-    createSet,
+    setExercises,
     createUserExercise,
-    createOrGetExercise,
     deleteSet,
     deleteExercise,
     updateNotes,
+    saveWorkout,
   } = useWorkout(id);
 
   const [exerciseName, setExerciseName] = useState("");
   const [reps, setReps] = useState<number>(defaultReps);
   const [weight, setWeight] = useState<number>(defaultWeight);
-  const [additionLoading, setAdditionLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [notes, setNotes] = useState("");
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   /**
@@ -71,9 +71,7 @@ export default function WorkoutPage() {
   const addExerciseMode = currentMode === ADD_MODES.exercise;
 
   const addButtonDisabled =
-    (addSetMode && !reps) ||
-    (addExerciseMode && !exerciseName) ||
-    additionLoading;
+    (addSetMode && !reps) || (addExerciseMode && !exerciseName);
 
   const handleSetExerciseName = async (
     option: SingleValue<{ value: string; label: string }>,
@@ -93,27 +91,57 @@ export default function WorkoutPage() {
   };
 
   const addSet = async () => {
-    if (!workout) return;
-    setAdditionLoading(true);
-
-    const exercise = await createOrGetExercise(exerciseName);
-
-    if (exercise) {
-      await createSet(exercise, { reps, weight });
-      setAdditionLoading(false);
-    }
-
+    const newSet = { weight, reps, id: null, exercise_id: "" };
+    setExercises((prev) => {
+      if (prev.find((ex) => ex.name === exerciseName)) {
+        return prev.map((ex) => {
+          if (ex.name === exerciseName) {
+            return { ...ex, sets: [...ex.sets, newSet] };
+          }
+          return ex;
+        });
+      }
+      return [
+        ...prev,
+        {
+          id: null,
+          name: exerciseName,
+          sets: [newSet],
+          workout_id: id,
+          temporaryId: Math.random().toString(10).substring(2, 8),
+        },
+      ];
+    });
     setWeight(defaultWeight);
     setReps(defaultReps);
   };
 
   const addExercise = async () => {
-    await createOrGetExercise(exerciseName);
+    setExercises((prev) => {
+      return [
+        ...prev,
+        {
+          id: null,
+          name: exerciseName,
+          sets: [],
+          workout_id: id,
+          temporaryId: Math.random().toString(10).substring(2, 8),
+        },
+      ];
+    });
   };
 
   const handleAddClick = async () => {
     if (addSetMode) return addSet();
     if (addExerciseMode) return addExercise();
+  };
+  const handleSaveWorkout = async () => {
+    setIsSaving(true);
+    if (!workout) return;
+
+    await saveWorkout(workout?.id, exercises);
+
+    setIsSaving(false);
   };
 
   const handleNotesInput = async (
@@ -158,7 +186,15 @@ export default function WorkoutPage() {
       ) : (
         <>
           <Header title={workout.title} subtitle={workout.date} />
-
+          <div className="flex justify-end">
+            <Button
+              className="w-40"
+              disabled={isSaving}
+              onClick={handleSaveWorkout}
+            >
+              {isSaving ? <Spinner /> : "Save Workout"}
+            </Button>
+          </div>
           <div className="space-y-3 mb-6">
             <label>Exercise</label>
             <CreatableSelect

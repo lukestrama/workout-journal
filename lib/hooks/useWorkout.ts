@@ -6,7 +6,7 @@ import {
   userExercisesService,
 } from "../supabase/services";
 import { useUser } from "@clerk/nextjs";
-import { Exercise, UserExercise, Workout } from "../supabase/models";
+import { Exercise, hasTempId, UserExercise, Workout } from "../supabase/models";
 import { useEffect, useState, useCallback } from "react";
 import { useSupabase } from "../supabase/SupabaseProvider";
 
@@ -115,8 +115,22 @@ export function useWorkout(workoutId: string) {
     }
   }, [user, loadUserExercises]);
 
+  async function saveWorkout(workoutId: string, exercises: Exercise[]) {
+    if (!user) return;
+    try {
+      await workoutService.saveWorkoutWithExercisesAndSets(
+        supabase!,
+        workoutId,
+        exercises
+      );
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to delete the set."
+      );
+    }
+  }
   async function createSet(
-    exercise: Exercise,
+    exercise: Exercise & hasTempId,
     setData: {
       reps: number;
       weight: number;
@@ -125,7 +139,7 @@ export function useWorkout(workoutId: string) {
     try {
       const newSet = await setsService.createSet(supabase!, {
         ...setData,
-        exercise_id: exercise.id,
+        exercise_id: (exercise.id || exercise.temporaryId)!,
       });
 
       setExercises((prev) => {
@@ -201,5 +215,7 @@ export function useWorkout(workoutId: string) {
     deleteSet,
     deleteExercise,
     updateNotes,
+    setExercises,
+    saveWorkout,
   };
 }

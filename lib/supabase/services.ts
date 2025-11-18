@@ -75,6 +75,72 @@ export const workoutService = {
 
     return data;
   },
+  async saveWorkoutWithExercisesAndSets(
+    supabase: SupabaseClient,
+    workoutId: string,
+    exercises: Omit<Exercise, "created_at" | "workout_id">[]
+  ) {
+    const workout = await this.getWorkout(supabase, workoutId);
+
+    if (!workout) return;
+
+    const exercisesUpdated = exercises.filter((ex) => ex.id !== null);
+
+    const exerciseInsertPayload = exercises
+      .filter((ex) => ex.id === null)
+      .map((ex) => ({
+        name: ex.name,
+        workout_id: workout.id,
+        date: workout.date,
+      }));
+
+    const { data: exerciseRows, error: exerciseError } = await supabase
+      .from("exercises")
+      .insert(exerciseInsertPayload)
+      .select();
+
+    const allSets: Omit<ExerciseSet, "id">[] = [];
+    if (exerciseRows) {
+      for (const row of exerciseRows) {
+        const exercise = exercises.find((ex) => ex.name === row.name);
+
+        exercise?.sets.forEach((set) => {
+          allSets.push({
+            weight: set.weight,
+            reps: set.reps,
+            exercise_id: row.id,
+          });
+        });
+      }
+    }
+    if (exercisesUpdated) {
+      for (const row of exercisesUpdated) {
+        const exercise = exercises.find((ex) => ex.name === row.name);
+
+        exercise?.sets
+          .filter((set) => set.id === null)
+          .forEach((set) => {
+            allSets.push({
+              weight: set.weight,
+              reps: set.reps,
+              exercise_id: row.id!,
+            });
+          });
+      }
+    }
+
+    if (exerciseError) throw exerciseError;
+
+    if (allSets.length > 0) {
+      const { error: setError } = await supabase.from("sets").insert(allSets);
+
+      if (setError) throw setError;
+    }
+    return {
+      exercises: exerciseRows,
+      setsInserted: allSets.length,
+    };
+  },
 };
 
 export const exerciseService = {
