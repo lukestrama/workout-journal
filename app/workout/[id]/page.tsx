@@ -236,11 +236,7 @@ export default function WorkoutPage() {
               onClick={handleAddClick}
               className="w-full"
             >
-              {additionLoading ? (
-                <i className="fa-solid fa-spinner fa-spin"></i>
-              ) : (
-                <span>{addLabel}</span>
-              )}
+              <span>{addLabel}</span>
             </Button>
           </div>
 
