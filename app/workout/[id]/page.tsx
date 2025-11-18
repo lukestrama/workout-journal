@@ -13,6 +13,16 @@ import Spinner from "@/app/components/Spinner";
 import getAddMode from "./utils/getAddMode";
 import { ADD_MODES } from "@/lib/constants";
 import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const defaultWeight = 0;
 const defaultReps = 0;
@@ -39,6 +49,7 @@ const selectStyles = {
 };
 
 export default function WorkoutPage() {
+  const router = useRouter();
   const { id } = useParams<{ id: string }>();
   const {
     workout,
@@ -57,6 +68,8 @@ export default function WorkoutPage() {
   const [weight, setWeight] = useState<number>(defaultWeight);
   const [isSaving, setIsSaving] = useState(false);
   const [notes, setNotes] = useState("");
+  const [isSaved, setIsSaved] = useState(true);
+  const [displayWarningDialog, setDisplayWarningDialog] = useState(true);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   /**
    * the idea here is that if we have an exercise that has already
@@ -132,6 +145,7 @@ export default function WorkoutPage() {
   };
 
   const handleAddClick = async () => {
+    setIsSaved(false);
     if (addSetMode) return addSet();
     if (addExerciseMode) return addExercise();
   };
@@ -142,12 +156,26 @@ export default function WorkoutPage() {
     await saveWorkout(workout?.id, exercises);
 
     setIsSaving(false);
+    setIsSaved(true);
   };
 
   const handleNotesInput = async (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     setNotes(e.currentTarget.value);
+  };
+
+  const handleBackToWorkouts = async () => {
+    if (!displayWarningDialog) {
+      setDisplayWarningDialog(true);
+    } else {
+      router.push("/");
+    }
+  };
+
+  const handleSaveWorkoutAndRedirect = () => {
+    handleSaveWorkout();
+    router.push("/");
   };
 
   const addLabel = addSetMode ? "Add Set" : "Add Exercise";
@@ -177,6 +205,19 @@ export default function WorkoutPage() {
     }
   }, [workout?.notes]);
 
+  useEffect(() => {
+    function beforeUnload(e: BeforeUnloadEvent) {
+      if (isSaved) return;
+      e.preventDefault();
+    }
+
+    window.addEventListener("beforeunload", beforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", beforeUnload);
+    };
+  }, [isSaved]);
+
   return (
     <main className="p-6">
       {!workout ? (
@@ -187,6 +228,27 @@ export default function WorkoutPage() {
         <>
           <Header title={workout.title} subtitle={workout.date} />
           <div className="flex justify-end">
+            {isSaved ? (
+              <Link href="/">Back to workouts</Link>
+            ) : (
+              <Dialog>
+                <DialogTrigger>Back to workouts</DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>You have unsaved changes</DialogTitle>
+                    <DialogDescription>
+                      <Button onClick={handleBackToWorkouts}>
+                        Discard changes
+                      </Button>
+                      <Button onClick={handleSaveWorkoutAndRedirect}>
+                        Save changes
+                      </Button>
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
+            )}
+
             <Button
               className="w-40"
               disabled={isSaving}
