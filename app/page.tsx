@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import Spinner from "./components/Spinner";
 import Dialog from "./components/Dialog";
+import LandingPage from "./components/LandingPage";
 
 export default function HomePage() {
   const { user } = useUser();
@@ -28,7 +29,7 @@ export default function HomePage() {
   return (
     <main className="p-6">
       {!user ? (
-        <></>
+        <LandingPage />
       ) : (
         <>
           <div className="flex justify-between items-center">
