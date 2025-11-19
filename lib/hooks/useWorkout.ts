@@ -19,6 +19,10 @@ export function useWorkout(workoutId: string) {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>("");
+  const [hasLoadedWorkout, setHasLoadedWorkout] = useState(false);
+
+  // Extract stable user ID to prevent unnecessary re-renders on session refresh
+  const userId = user?.id;
 
   const loadWorkout = useCallback(async () => {
     if (!workoutId) return;
@@ -33,6 +37,7 @@ export function useWorkout(workoutId: string) {
 
       setWorkout(data.workout);
       setExercises(data.exercisesWithSets);
+      setHasLoadedWorkout(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load workout.");
     } finally {
@@ -41,15 +46,15 @@ export function useWorkout(workoutId: string) {
   }, [workoutId, supabase]);
 
   useEffect(() => {
-    if (workoutId) {
+    if (workoutId && !hasLoadedWorkout) {
       loadWorkout();
     }
-  }, [workoutId, supabase, loadWorkout]);
+  }, [workoutId, hasLoadedWorkout, loadWorkout]);
 
   async function createOrGetExercise(
     name: string
   ): Promise<Exercise | undefined> {
-    if (!workout || !user) throw new Error("Workout not loaded");
+    if (!workout || !userId) throw new Error("Workout not loaded");
     try {
       const exercise = await exerciseService.getOrCreateExercise(supabase!, {
         name,
@@ -72,14 +77,14 @@ export function useWorkout(workoutId: string) {
   }
 
   async function createUserExercise(name: string) {
-    if (!workout || !user) throw new Error("Workout not loaded");
+    if (!workout || !userId) throw new Error("Workout not loaded");
 
     try {
       const newExercise = await userExercisesService.createUserExercise(
         supabase!,
         {
           name,
-          user_id: user.id,
+          user_id: userId,
         }
       );
 
@@ -92,14 +97,14 @@ export function useWorkout(workoutId: string) {
   }
 
   const loadUserExercises = useCallback(async () => {
-    if (!workoutId || !user) return;
+    if (!workoutId || !userId) return;
 
     try {
       setLoading(true);
       setError(null);
       const userExercises = await exerciseService.getUserExercises(
         supabase!,
-        user.id
+        userId
       );
       setUserExercises(userExercises);
     } catch (err) {
@@ -107,16 +112,16 @@ export function useWorkout(workoutId: string) {
     } finally {
       setLoading(false);
     }
-  }, [supabase, user, workoutId]);
+  }, [supabase, userId, workoutId]);
 
   useEffect(() => {
-    if (user) {
+    if (userId) {
       loadUserExercises();
     }
-  }, [user, loadUserExercises]);
+  }, [userId, loadUserExercises]);
 
   async function saveWorkout(workoutId: string, exercises: Exercise[]) {
-    if (!user) return;
+    if (!userId) return;
     try {
       await workoutService.saveWorkoutWithExercisesAndSets(
         supabase!,

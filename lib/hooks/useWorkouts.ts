@@ -12,31 +12,34 @@ export function useWorkouts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>("");
 
+  // Extract stable user ID to prevent unnecessary re-renders on session refresh
+  const userId = user?.id;
+
   const loadWorkouts = useCallback(async () => {
-    if (!user) return;
+    if (!userId) return;
     try {
       setLoading(true);
       setError(null);
-      const data = await workoutService.getWorkouts(supabase!, user.id);
+      const data = await workoutService.getWorkouts(supabase!, userId);
       setWorkouts(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load workouts.");
     } finally {
       setLoading(false);
     }
-  }, [user, supabase]);
+  }, [userId, supabase]);
 
   useEffect(() => {
-    if (user) {
+    if (userId) {
       loadWorkouts();
     }
-  }, [user, supabase, loadWorkouts]);
+  }, [userId, loadWorkouts]);
 
   async function createWorkout(
     title: string,
     date: string
   ): Promise<Workout | undefined> {
-    if (!user) throw Error("Must be signed in to create a workout");
+    if (!userId) throw Error("Must be signed in to create a workout");
     let workout: Workout;
 
     try {
@@ -44,7 +47,7 @@ export function useWorkouts() {
       workout = await workoutService.createWorkout(supabase!, {
         title,
         date,
-        user_id: user.id,
+        user_id: userId,
       });
 
       setWorkouts((prev) => [workout, ...prev]);
