@@ -6,7 +6,6 @@ import { useWorkout } from "@/lib/hooks/useWorkout";
 import CreatableSelect from "react-select/creatable";
 import { SingleValue, ActionMeta } from "react-select";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import ExerciseRow from "@/app/components/exercises/ExerciseRow";
 import { Header } from "@/app/components/Header";
 import Spinner from "@/app/components/Spinner";
@@ -15,15 +14,9 @@ import { ADD_MODES } from "@/lib/constants";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import UnsavedChangesModal from "./components/UnsavedChangesModal";
 import { genRandomInt } from "@/lib/utils";
+import AddWeightReps from "./components/AddWeightReps";
 
 const defaultWeight = 0;
 const defaultReps = 0;
@@ -260,29 +253,10 @@ export default function WorkoutPage() {
                 <Link href="/">Back to workouts</Link>
               </Button>
             ) : (
-              <Dialog>
-                <Button className="flex-1" variant={"secondary"} asChild>
-                  <DialogTrigger>Back to workouts</DialogTrigger>
-                </Button>
-                <DialogContent className="text-center w-80">
-                  <DialogHeader>
-                    <DialogTitle className="text-center">
-                      You have unsaved changes
-                    </DialogTitle>
-                    <DialogDescription className="flex gap-2 justify-center">
-                      <Button
-                        variant={"destructive"}
-                        onClick={handleBackToWorkouts}
-                      >
-                        Discard changes
-                      </Button>
-                      <Button onClick={handleSaveWorkoutAndRedirect}>
-                        Save changes
-                      </Button>
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
+              <UnsavedChangesModal
+                handleBackToWorkouts={handleBackToWorkouts}
+                handleSaveWorkoutAndRedirect={handleSaveWorkoutAndRedirect}
+              />
             )}
 
             <Button
@@ -304,31 +278,12 @@ export default function WorkoutPage() {
               onChange={handleSetExerciseName}
               classNames={selectStyles}
             />
-            <div className="flex items-end gap-4 mb-5 w-full">
-              <div className="flex-1">
-                <label>Weight</label>
-                <Input
-                  className="border p-2 w-full"
-                  type="number"
-                  placeholder="Weight (kg)"
-                  value={weight || ""}
-                  onChange={(e) => setWeight(Number(e.target.value))}
-                />{" "}
-              </div>
-              <div className="pb-1">
-                <i className="fa-solid fa-xmark"></i>
-              </div>
-              <div className="flex-1">
-                <label>Reps</label>
-                <Input
-                  className="border p-2 w-full"
-                  type="number"
-                  placeholder="Reps"
-                  value={reps || ""}
-                  onChange={(e) => setReps(Number(e.target.value))}
-                />
-              </div>
-            </div>
+            <AddWeightReps
+              weight={weight}
+              reps={reps}
+              setReps={setReps}
+              setWeight={setWeight}
+            />
             <Button
               disabled={addButtonDisabled}
               onClick={handleAddClick}
