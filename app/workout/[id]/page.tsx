@@ -14,9 +14,9 @@ import { ADD_MODES } from "@/lib/constants";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import UnsavedChangesModal from "./components/UnsavedChangesModal";
 import { genRandomInt } from "@/lib/utils";
 import AddWeightReps from "./components/AddWeightReps";
+import Dialog from "@/app/components/Dialog";
 
 const defaultWeight = 0;
 const defaultReps = 0;
@@ -253,10 +253,17 @@ export default function WorkoutPage() {
                 <Link href="/">Back to workouts</Link>
               </Button>
             ) : (
-              <UnsavedChangesModal
-                handleBackToWorkouts={handleBackToWorkouts}
-                handleSaveWorkoutAndRedirect={handleSaveWorkoutAndRedirect}
-              />
+              <Dialog
+                buttonText="Back to Workouts"
+                titleText="You have unsaved changes"
+              >
+                <Button variant={"destructive"} onClick={handleBackToWorkouts}>
+                  Discard changes
+                </Button>
+                <Button onClick={handleSaveWorkoutAndRedirect}>
+                  Save changes
+                </Button>
+              </Dialog>
             )}
 
             <Button

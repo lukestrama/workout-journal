@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Spinner from "./components/Spinner";
+import Dialog from "./components/Dialog";
 
 export default function HomePage() {
   const { user } = useUser();
@@ -36,7 +37,6 @@ export default function HomePage() {
               <Link href="/add">Add workout</Link>
             </Button>
           </div>
-          {/* TODO: Deal with flicker here. No workouts shows first before spinner */}
           {workouts.length === 0 ? (
             loading ? (
               <Spinner />
@@ -47,22 +47,36 @@ export default function HomePage() {
             <ul className="space-y-2">
               {workouts.map((w) => (
                 <li key={w.id} className="my-4">
-                  <Link href={`/workout/${w.id}`} className="text-lg">
-                    <Card>
-                      <CardHeader className="flex justify-between">
-                        <div>
-                          <CardTitle>{w.title}</CardTitle>
-                          <CardDescription>{w.date}</CardDescription>
-                        </div>
+                  <div className="relative">
+                    <Link href={`/workout/${w.id}`} className="text-lg flex-1">
+                      <Card>
+                        <CardHeader className="flex justify-between">
+                          <div>
+                            <CardTitle>{w.title}</CardTitle>
+                            <CardDescription>{w.date}</CardDescription>
+                          </div>
+                        </CardHeader>
+                      </Card>
+                    </Link>
+                    <Dialog
+                      triggerClasses="absolute right-[20px] top-[30%]"
+                      buttonText="Delete"
+                      titleText="Delete workout?"
+                      triggerButtonVariant={"destructive"}
+                    >
+                      <div className="text-center">
+                        <p className="mb-3 text-lg">
+                          Are you sure you want to delete your workout?
+                        </p>
                         <Button
                           onClick={(e) => handleDeleteWorkout(e, w.id)}
                           variant={"destructive"}
                         >
                           Delete
                         </Button>
-                      </CardHeader>
-                    </Card>
-                  </Link>
+                      </div>
+                    </Dialog>
+                  </div>
                 </li>
               ))}
             </ul>
