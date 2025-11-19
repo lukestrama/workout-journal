@@ -4,7 +4,7 @@ import Link from "next/link";
 const LandingPage = () => {
   return (
     <main className="min-h-full">
-      <section className="hero-gradient py-20 px-6">
+      <section className="hero-gradient px-5 h-screen flex justify-center items-center">
         <div className="max-w-6xl mx-auto text-center">
           <h1
             id="main-heading"
@@ -24,7 +24,7 @@ const LandingPage = () => {
           </Button>
         </div>
       </section>
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 bg-primary-foreground">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16 text-primary-foreground">
             Why Choose Our Program

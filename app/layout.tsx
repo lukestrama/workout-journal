@@ -42,7 +42,7 @@ export default function RootLayout({
           <body
             className={`${leagueSpartan.className} antialiased bg-[#1A191A] text-white`}
           >
-            <header className="flex justify-end items-center p-4 gap-4 h-16">
+            <header className="flex justify-end items-center p-4 gap-4 h-16 w-full bg-secondary">
               <SignedOut>
                 <SignInButton />
                 <SignUpButton>
