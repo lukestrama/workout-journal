@@ -1,74 +1,19 @@
 "use client";
 
-import Link from "next/link";
+import LandingPage from "./components/LandingPage";
 import { useUser } from "@clerk/nextjs";
-import { useWorkouts } from "@/lib/hooks/useWorkouts";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { redirect } from "next/navigation";
 import Spinner from "./components/Spinner";
 
 export default function HomePage() {
-  const { user } = useUser();
-  const { workouts, deleteWorkout, loading } = useWorkouts();
+  const { user, isLoaded } = useUser();
+  if (user) redirect("/workouts");
 
-  const handleDeleteWorkout = (
-    e: React.MouseEvent<HTMLButtonElement>,
-    workoutId: string
-  ) => {
-    e.preventDefault();
-    deleteWorkout(workoutId);
-  };
-
-  return (
-    <main className="p-6">
-      {!user ? (
-        <></>
-      ) : (
-        <>
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">My Workouts</h1>
-            <Button asChild>
-              <Link href="/add">Add workout</Link>
-            </Button>
-          </div>
-          {/* TODO: Deal with flicker here. No workouts shows first before spinner */}
-          {workouts.length === 0 ? (
-            loading ? (
-              <Spinner />
-            ) : (
-              <p>No workouts yet. Add one!</p>
-            )
-          ) : (
-            <ul className="space-y-2">
-              {workouts.map((w) => (
-                <li key={w.id} className="my-4">
-                  <Link href={`/workout/${w.id}`} className="text-lg">
-                    <Card>
-                      <CardHeader className="flex justify-between">
-                        <div>
-                          <CardTitle>{w.title}</CardTitle>
-                          <CardDescription>{w.date}</CardDescription>
-                        </div>
-                        <Button
-                          onClick={(e) => handleDeleteWorkout(e, w.id)}
-                          variant={"destructive"}
-                        >
-                          Delete
-                        </Button>
-                      </CardHeader>
-                    </Card>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </>
-      )}
-    </main>
+  return isLoaded ? (
+    <LandingPage />
+  ) : (
+    <div className="h-screen flex justify-center items-center text-8xl">
+      <Spinner />
+    </div>
   );
 }

@@ -10,6 +10,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import SupabaseProvider from "@/lib/supabase/SupabaseProvider";
+import { Button } from "@/components/ui/button";
 
 const leagueSpartan = League_Spartan({
   weight: "400",
@@ -39,15 +40,13 @@ export default function RootLayout({
         </head>
         <SupabaseProvider>
           <body
-            className={`${leagueSpartan.className} antialiased bg-[#1A191A] text-white`}
+            className={`${leagueSpartan.className} antialiased bg-secondary text-white`}
           >
-            <header className="flex justify-end items-center p-4 gap-4 h-16">
+            <header className="flex justify-end items-center p-4 gap-4 h-16 w-full bg-secondary">
               <SignedOut>
                 <SignInButton />
                 <SignUpButton>
-                  <button className="bg-[#6c47ff] text-ceramic-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
-                    Sign Up
-                  </button>
+                  <Button>Sign Up</Button>
                 </SignUpButton>
               </SignedOut>
               <SignedIn>
