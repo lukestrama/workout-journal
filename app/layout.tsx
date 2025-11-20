@@ -40,7 +40,7 @@ export default function RootLayout({
         </head>
         <SupabaseProvider>
           <body
-            className={`${leagueSpartan.className} antialiased bg-[#1A191A] text-white`}
+            className={`${leagueSpartan.className} antialiased bg-secondary text-white`}
           >
             <header className="flex justify-end items-center p-4 gap-4 h-16 w-full bg-secondary">
               <SignedOut>
