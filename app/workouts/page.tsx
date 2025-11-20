@@ -27,7 +27,9 @@ export default function WorkoutsPage() {
   return (
     <main className="p-6">
       {!user ? (
-        <Spinner />
+        <div className="flex justify-center items-center text-2xl mt-8">
+          <Spinner />
+        </div>
       ) : (
         <>
           <div className="flex justify-between items-center">
@@ -38,7 +40,9 @@ export default function WorkoutsPage() {
           </div>
           {workouts.length === 0 ? (
             loading ? (
-              <Spinner />
+              <div className="flex justify-center items-center text-2xl mt-8">
+                <Spinner />
+              </div>
             ) : (
               <p>No workouts yet. Add one!</p>
             )

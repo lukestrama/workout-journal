@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import Link from "next/link";
 
 const LandingPage = () => {
@@ -81,10 +82,13 @@ const LandingPage = () => {
             <div className="space-y-4">
               <div className="bg-gray-100 rounded-2xl p-8 aspect-[4/3] flex items-center justify-center shadow-lg">
                 <div className="text-center">
-                  <div className="text-6xl mb-4">📱</div>
-                  <p className="text-gray-500 text-lg">Screenshot 1</p>
                   <p className="text-gray-400 text-sm mt-2">
-                    Add your screenshot here
+                    <Image
+                      width={300}
+                      height={900}
+                      alt="View of the add exercises to workout screen"
+                      src={"/workout-view.jpg"}
+                    />
                   </p>
                 </div>
               </div>
@@ -98,18 +102,19 @@ const LandingPage = () => {
             <div className="space-y-4">
               <div className="bg-gray-100 rounded-2xl p-8 aspect-[4/3] flex items-center justify-center shadow-lg">
                 <div className="text-center">
-                  <div className="text-6xl mb-4">📈</div>
-                  <p className="text-gray-500 text-lg">Screenshot 2</p>
-                  <p className="text-gray-400 text-sm mt-2">
-                    Add your screenshot here
-                  </p>
+                  <Image
+                    width={300}
+                    height={900}
+                    alt="View of the workouts screen"
+                    src={"/workouts-view.jpg"}
+                  />
                 </div>
               </div>
               <p
                 id="screenshot-2-caption"
                 className="text-center text-gray-600 text-lg"
               >
-                Visualize your progress over time
+                See your workouts all in one simple clean layout
               </p>
             </div>
           </div>
