@@ -295,6 +295,7 @@ export default function WorkoutPage() {
                     deleteSet={deleteSet}
                     key={ex.id || ex.temporaryId}
                     exercise={ex}
+                    workoutDate={workout.date}
                   />
                 ))
               : ""}

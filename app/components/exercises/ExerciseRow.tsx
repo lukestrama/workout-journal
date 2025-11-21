@@ -13,6 +13,7 @@ interface ExerciseRowProps {
   removeLocalSet: (setId: string) => void;
   removeLocalExercise: (exerciseId: string) => void;
   deleteExercise: (exerciseId: string) => void;
+  workoutDate: string;
 }
 const ExerciseRow = ({
   exercise,
@@ -20,6 +21,7 @@ const ExerciseRow = ({
   deleteExercise,
   removeLocalSet,
   removeLocalExercise,
+  workoutDate,
 }: ExerciseRowProps) => {
   const { lastExercises } = useExercise(exercise);
 
@@ -53,22 +55,28 @@ const ExerciseRow = ({
           side="top"
           className="w-80"
         >
-          {lastExercises.length ? (
+          {lastExercises.length > 1 ? ( // one will mean its the current exercise (I think)
             <p className="text-lg">Previous workouts</p>
           ) : (
             ""
           )}
-          {lastExercises.map((ex: Exercise) => (
-            <p key={ex.id}>
-              {ex.workout_date} -
-              {ex.sets?.map((set, idx) => (
-                <span key={set.id}>
-                  {idx > 0 ? ", " : " "}
-                  {set.weight ? set.weight : ""}x{set.reps}
-                </span>
-              ))}
-            </p>
-          ))}
+          {lastExercises.map((ex: Exercise) => {
+            // filter out current workout, we don't need to see that
+            if (ex.workout_date !== workoutDate) {
+              return (
+                <p key={ex.id}>
+                  {ex.workout_date} -
+                  {ex.sets?.map((set, idx) => (
+                    <span key={set.id}>
+                      {idx > 0 ? ", " : " "}
+                      {set.weight ? set.weight : ""}x{set.reps}
+                    </span>
+                  ))}
+                </p>
+              );
+            }
+            return null;
+          })}
           <div className="w-full flex">
             <Button
               variant={"destructive"}
