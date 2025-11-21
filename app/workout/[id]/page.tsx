@@ -150,6 +150,7 @@ export default function WorkoutPage() {
     if (addSetMode) return addSet();
     if (addExerciseMode) return addExercise();
   };
+
   const handleSaveWorkout = async () => {
     setIsSaving(true);
     if (!workout) return;
@@ -158,6 +159,7 @@ export default function WorkoutPage() {
 
     setIsSaving(false);
     setIsSaved(true);
+    localStorage.removeItem("exercises");
   };
 
   const handleNotesInput = async (
@@ -210,14 +212,19 @@ export default function WorkoutPage() {
       if (notes) {
         updateNotes(id, notes);
       }
-    }, 1000);
+      if (!isSaved && workout?.id) {
+        saveWorkout(workout?.id, exercises).then(() => {
+          setIsSaved(true);
+        });
+      }
+    }, 1500);
 
     return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [notes, updateNotes, id]);
+  }, [notes, updateNotes, id, workout, exercises, isSaved, saveWorkout]);
 
   useEffect(() => {
     if (workout?.notes !== undefined) {

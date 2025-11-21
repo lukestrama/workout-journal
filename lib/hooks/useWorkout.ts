@@ -123,11 +123,31 @@ export function useWorkout(workoutId: string) {
   async function saveWorkout(workoutId: string, exercises: Exercise[]) {
     if (!userId) return;
     try {
-      await workoutService.saveWorkoutWithExercisesAndSets(
+      const response = await workoutService.saveWorkoutWithExercisesAndSets(
         supabase!,
         workoutId,
         exercises
       );
+
+      // return the updated ID here that previously was a temporary ID.
+      // the risk here is if we have multiple exercise names that are the same but in theory that should happen...
+      setExercises((prev) => {
+        return prev.map((ex) => {
+          if (response) {
+            const matchingResponseExercise = response.exercises.find(
+              (respEx) => respEx.name === ex.name
+            );
+            if (matchingResponseExercise) {
+              return {
+                ...ex,
+                id: matchingResponseExercise.id,
+                temporaryId: undefined,
+              };
+            }
+          }
+          return ex;
+        });
+      });
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to delete the set."
