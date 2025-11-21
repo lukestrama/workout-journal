@@ -13,10 +13,8 @@ import getAddMode from "./utils/getAddMode";
 import { ADD_MODES } from "@/lib/constants";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { genRandomInt } from "@/lib/utils";
 import AddWeightReps from "./components/AddWeightReps";
-import Dialog from "@/app/components/Dialog";
 
 const defaultWeight = 0;
 const defaultReps = 0;
@@ -27,7 +25,7 @@ interface StateProperties {
 
 const selectStyles = {
   menu: () => {
-    return "!bg-[#1A191A]";
+    return "!bg-[#1A191A] !text-lg";
   },
   option: (state: StateProperties) => {
     return `!bg-[#1A191A] hover:!bg-lime-950 active:!bg-lime-950 active:!border-lime-800 active:!border-solid active:!border-1 ${
@@ -168,14 +166,6 @@ export default function WorkoutPage() {
     setNotes(e.currentTarget.value);
   };
 
-  const handleBackToWorkouts = async () => {
-    if (!displayWarningDialog) {
-      setDisplayWarningDialog(true);
-    } else {
-      router.push("/");
-    }
-  };
-
   const handleLocalSetDelete = (setId: string) => {
     setExercises((prev) => {
       return prev
@@ -195,8 +185,12 @@ export default function WorkoutPage() {
     setIsSaved(false);
   };
 
-  const handleSaveWorkoutAndRedirect = () => {
-    handleSaveWorkout();
+  const handleSaveWorkoutAndRedirect = async () => {
+    if (!isSaved) {
+      setIsSaving(true);
+      await handleSaveWorkout();
+      setIsSaving(false);
+    }
     router.push("/");
   };
 
@@ -253,32 +247,15 @@ export default function WorkoutPage() {
         </div>
       ) : (
         <>
-          <Header title={workout.title} subtitle={workout.date} />
-          <div className="flex w-full my-4 md:justify-end gap-2">
-            {isSaved ? (
-              <Button className="flex-1" variant={"secondary"} asChild>
-                <Link href="/">Back to workouts</Link>
-              </Button>
-            ) : (
-              <Dialog
-                buttonText="Back to Workouts"
-                titleText="You have unsaved changes"
-              >
-                <Button variant={"destructive"} onClick={handleBackToWorkouts}>
-                  Discard changes
-                </Button>
-                <Button onClick={handleSaveWorkoutAndRedirect}>
-                  Save changes
-                </Button>
-              </Dialog>
-            )}
-
+          <div className="flex items-center">
+            <Header title={workout.title} subtitle={workout.date} />
             <Button
-              className="flex-1"
+              onClick={handleSaveWorkoutAndRedirect}
+              className=""
+              variant={"secondary"}
               disabled={isSaving}
-              onClick={handleSaveWorkout}
             >
-              {isSaving ? <Spinner /> : "Save Workout"}
+              {isSaving ? "Saving..." : "Back to workouts"}
             </Button>
           </div>
           <div className="space-y-3 mb-6">
@@ -307,7 +284,7 @@ export default function WorkoutPage() {
             </Button>
           </div>
 
-          <h3 className="font-bold mb-2">Exercises</h3>
+          <h3 className="font-bold mb-2 text-xl">Exercises</h3>
           <ul className="space-y-2">
             {exercises.length
               ? exercises.map((ex) => (
@@ -322,7 +299,7 @@ export default function WorkoutPage() {
                 ))
               : ""}
           </ul>
-          <p className="mt-4 mb-2">Notes</p>
+          <p className="mt-4 mb-2 text-xl">Notes</p>
           <Textarea
             className="w-full p-2"
             rows={3}

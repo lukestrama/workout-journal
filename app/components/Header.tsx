@@ -6,9 +6,9 @@ export const Header = ({
   subtitle?: string;
 }) => {
   return (
-    <div className="flex items-center gap-4 mb-4">
+    <div className="flex items-center gap-4 mb-4 flex-1">
       <div>
-        <h1 className="text-2xl font-bold">{title}</h1>
+        <h1 className="text-3xl font-bold">{title}</h1>
         {subtitle && <>{subtitle}</>}
       </div>
     </div>

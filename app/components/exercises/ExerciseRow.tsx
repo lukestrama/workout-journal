@@ -40,7 +40,7 @@ const ExerciseRow = ({
   };
 
   return (
-    <li>
+    <li className="text-lg">
       <Popover>
         <PopoverTrigger asChild>
           <Button className="px-2" variant={"ghost"}>
