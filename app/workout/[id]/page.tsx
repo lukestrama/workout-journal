@@ -17,12 +17,14 @@ import { useRouter } from "next/navigation";
 import { genRandomInt } from "@/lib/utils";
 import AddWeightReps from "./components/AddWeightReps";
 import { selectStyles } from "@/lib/utils";
+import { useConnectionStatus } from "@/lib/hooks/useConnectionStatus";
 
 const defaultWeight = 0;
 const defaultReps = 0;
 
 export default function WorkoutPage() {
   const router = useRouter();
+  const { isOnline } = useConnectionStatus();
   const { id } = useParams<{ id: string }>();
   const {
     workout,
@@ -186,7 +188,7 @@ export default function WorkoutPage() {
       if (notes) {
         updateNotes(id, notes);
       }
-      if (!isSaved && workout?.id) {
+      if (!isSaved && workout?.id && isOnline) {
         saveWorkout(workout?.id, exercises).then(() => {
           setIsSaved(true);
         });
@@ -198,7 +200,16 @@ export default function WorkoutPage() {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [notes, updateNotes, id, workout, exercises, isSaved, saveWorkout]);
+  }, [
+    notes,
+    updateNotes,
+    id,
+    workout,
+    exercises,
+    isSaved,
+    saveWorkout,
+    isOnline,
+  ]);
 
   useEffect(() => {
     if (workout?.notes !== undefined) {
@@ -227,6 +238,11 @@ export default function WorkoutPage() {
         </div>
       ) : (
         <>
+          {!isOnline && (
+            <p className="bg-red-500 text-center w-full mb-5">
+              You are currently offline
+            </p>
+          )}
           <div className="flex items-start mb-5 sm:items-center">
             <Header title={workout.title} subtitle={workout.date} />
             <div className="flex flex-col-reverse sm:flex-row gap-4 items-center">
