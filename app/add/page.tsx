@@ -7,6 +7,9 @@ import { Workout } from "@/lib/supabase/models";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Header } from "../components/Header";
+import { WORKOUT_TYPES } from "@/lib/constants";
+import Select from "react-select";
+import { selectStyles } from "@/lib/utils";
 
 export default function AddWorkoutPage() {
   const router = useRouter();
@@ -14,11 +17,12 @@ export default function AddWorkoutPage() {
 
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
+  const [type, setType] = useState("other");
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
     setLoading(true);
-    const workout: Workout | undefined = await createWorkout(title, date);
+    const workout: Workout | undefined = await createWorkout(title, date, type);
     if (workout) router.push(`/workout/${workout.id}`);
     setLoading(false);
   };
@@ -39,6 +43,11 @@ export default function AddWorkoutPage() {
           className="border p-2 w-full"
           value={date}
           onChange={(e) => setDate(e.target.value)}
+        />
+        <Select
+          options={WORKOUT_TYPES}
+          onChange={(e) => setType(e?.value ? e.value : "other")}
+          classNames={selectStyles}
         />
         <Button onClick={handleSave} disabled={loading}>
           Save Workout

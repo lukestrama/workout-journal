@@ -37,7 +37,8 @@ export function useWorkouts() {
 
   async function createWorkout(
     title: string,
-    date: string
+    date: string,
+    type: string
   ): Promise<Workout | undefined> {
     if (!userId) throw Error("Must be signed in to create a workout");
     let workout: Workout;
@@ -47,6 +48,7 @@ export function useWorkouts() {
       workout = await workoutService.createWorkout(supabase!, {
         title,
         date,
+        type,
         user_id: userId,
       });
 

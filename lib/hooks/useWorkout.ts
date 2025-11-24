@@ -25,14 +25,15 @@ export function useWorkout(workoutId: string) {
   const userId = user?.id;
 
   const loadWorkout = useCallback(async () => {
-    if (!workoutId) return;
+    if (!workoutId || !user) return;
 
     try {
       setLoading(true);
       setError(null);
       const data = await workoutDataService.getWorkoutWithExercises(
         supabase!,
-        workoutId
+        workoutId,
+        user.id
       );
 
       setWorkout(data.workout);
@@ -43,7 +44,7 @@ export function useWorkout(workoutId: string) {
     } finally {
       setLoading(false);
     }
-  }, [workoutId, supabase]);
+  }, [workoutId, supabase, user]);
 
   useEffect(() => {
     if (workoutId && !hasLoadedWorkout) {
@@ -126,6 +127,7 @@ export function useWorkout(workoutId: string) {
       const response = await workoutService.saveWorkoutWithExercisesAndSets(
         supabase!,
         workoutId,
+        userId,
         exercises
       );
 

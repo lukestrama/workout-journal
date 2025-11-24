@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { useWorkout } from "@/lib/hooks/useWorkout";
 import CreatableSelect from "react-select/creatable";
 import { SingleValue, ActionMeta } from "react-select";
@@ -15,30 +16,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import { genRandomInt } from "@/lib/utils";
 import AddWeightReps from "./components/AddWeightReps";
+import { selectStyles } from "@/lib/utils";
 
 const defaultWeight = 0;
 const defaultReps = 0;
-
-interface StateProperties {
-  isSelected: boolean;
-}
-
-const selectStyles = {
-  menu: () => {
-    return "!bg-[#1A191A] !text-lg";
-  },
-  option: (state: StateProperties) => {
-    return `!bg-[#1A191A] hover:!bg-lime-950 active:!bg-lime-950 active:!border-lime-800 active:!border-solid active:!border-1 ${
-      state.isSelected ? "!bg-lime-950" : ""
-    }`;
-  },
-  control: () => {
-    return "!bg-[#1A191A] hover:!border-white !rounded-md";
-  },
-  singleValue: () => {
-    return "!text-white";
-  },
-};
 
 export default function WorkoutPage() {
   const router = useRouter();
@@ -61,7 +42,6 @@ export default function WorkoutPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [notes, setNotes] = useState("");
   const [isSaved, setIsSaved] = useState(true);
-  const [displayWarningDialog, setDisplayWarningDialog] = useState(true);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   /**
    * the idea here is that if we have an exercise that has already
@@ -247,16 +227,26 @@ export default function WorkoutPage() {
         </div>
       ) : (
         <>
-          <div className="flex items-center">
+          <div className="flex items-start mb-5 sm:items-center">
             <Header title={workout.title} subtitle={workout.date} />
-            <Button
-              onClick={handleSaveWorkoutAndRedirect}
-              className=""
-              variant={"secondary"}
-              disabled={isSaving}
-            >
-              {isSaving ? "Saving..." : "Back to workouts"}
-            </Button>
+            <div className="flex flex-col-reverse sm:flex-row gap-4 items-center">
+              <div className="flex justify-between gap-4">
+                {workout.lastWorkoutId && (
+                  <Link href={`/workout/${workout.lastWorkoutId}`}>Prev</Link>
+                )}
+                {workout.nextWorkoutId && (
+                  <Link href={`/workout/${workout.nextWorkoutId}`}>Next</Link>
+                )}
+              </div>
+              <Button
+                onClick={handleSaveWorkoutAndRedirect}
+                className=""
+                variant={"secondary"}
+                disabled={isSaving}
+              >
+                {isSaving ? "Saving..." : "Back to workouts"}
+              </Button>
+            </div>
           </div>
           <div className="space-y-3 mb-6">
             <label>Exercise</label>

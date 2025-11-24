@@ -19,22 +19,28 @@ export const workoutService = {
 
   async getWorkout(
     supabase: SupabaseClient,
-    workoutId: string
+    workoutId: string,
+    userId: string
   ): Promise<Workout> {
-    const { data, error } = await supabase
-      .from("workouts")
-      .select("*")
-      .eq("id", workoutId)
-      .single();
+    const { data, error } = await supabase.rpc(
+      "get_workout_with_neighbors_flat",
+      {
+        p_workout_id: workoutId,
+        p_user_id: userId,
+      }
+    );
 
     if (error) throw error;
 
-    return data || [];
+    return data;
   },
 
   async createWorkout(
     supabase: SupabaseClient,
-    workout: Omit<Workout, "id" | "created_at" | "exercises">
+    workout: Omit<
+      Workout,
+      "id" | "created_at" | "exercises" | "lastWorkoutId" | "nextWorkoutId"
+    >
   ): Promise<Workout> {
     const { data, error } = await supabase
       .from("workouts")
@@ -78,9 +84,10 @@ export const workoutService = {
   async saveWorkoutWithExercisesAndSets(
     supabase: SupabaseClient,
     workoutId: string,
+    userId: string,
     exercises: Omit<Exercise, "created_at" | "workout_id">[]
   ) {
-    const workout = await this.getWorkout(supabase, workoutId);
+    const workout = await this.getWorkout(supabase, workoutId, userId);
 
     if (!workout) return;
 
@@ -309,9 +316,13 @@ export const setsService = {
 };
 
 export const workoutDataService = {
-  async getWorkoutWithExercises(supabase: SupabaseClient, workoutId: string) {
+  async getWorkoutWithExercises(
+    supabase: SupabaseClient,
+    workoutId: string,
+    userId: string
+  ) {
     const [workout, exercises] = await Promise.all([
-      workoutService.getWorkout(supabase, workoutId),
+      workoutService.getWorkout(supabase, workoutId, userId),
       exerciseService.getExercises(supabase, workoutId),
     ]);
 
