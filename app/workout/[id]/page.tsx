@@ -168,6 +168,7 @@ export default function WorkoutPage() {
   };
 
   const handleSaveWorkoutAndRedirect = async () => {
+    if (!isOnline) return alert("You're offline.");
     if (!isSaved) {
       setIsSaving(true);
       await handleSaveWorkout();
