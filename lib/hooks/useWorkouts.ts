@@ -1,4 +1,4 @@
-import { workoutService } from "../supabase/services";
+import { localSyncService, workoutService } from "../supabase/services";
 import { useUser } from "@clerk/nextjs";
 import { Workout } from "../supabase/models";
 import { useEffect, useState, useCallback } from "react";
@@ -14,6 +14,11 @@ export function useWorkouts() {
 
   // Extract stable user ID to prevent unnecessary re-renders on session refresh
   const userId = user?.id;
+
+  const initialDataSync = useCallback(async () => {
+    if (!userId) return;
+    await localSyncService.fullInitialSync(userId, supabase!);
+  }, [userId, supabase]);
 
   const loadWorkouts = useCallback(async () => {
     if (!userId) return;
@@ -75,5 +80,12 @@ export function useWorkouts() {
     }
   }
 
-  return { workouts, loading, error, createWorkout, deleteWorkout };
+  return {
+    workouts,
+    loading,
+    error,
+    createWorkout,
+    deleteWorkout,
+    initialDataSync,
+  };
 }

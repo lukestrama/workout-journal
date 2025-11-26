@@ -11,10 +11,44 @@ import {
 } from "@/components/ui/card";
 import Spinner from "../components/Spinner";
 import Dialog from "../components/Dialog";
+import { db } from "@/lib/db";
+import { useEffect } from "react";
 
 export default function WorkoutsPage() {
   const { user } = useUser();
-  const { workouts, deleteWorkout, loading } = useWorkouts();
+  const { workouts, deleteWorkout, loading, initialDataSync } = useWorkouts();
+
+  // Initialize IndexedDB when user logs in
+  useEffect(() => {
+    const initializeDatabase = async () => {
+      if (!user?.id) return;
+
+      try {
+        console.log("Initializing database for user:", user.id);
+
+        // Initialize database first
+        await db.open();
+        console.log("Database opened successfully");
+
+        const hasSyncedBefore = await db.metadata.get("initialSyncDone");
+        console.log("Has synced before:", hasSyncedBefore);
+
+        if (!hasSyncedBefore) {
+          console.log("Starting initial data sync...");
+          await initialDataSync();
+          await db.metadata.put({
+            key: "initialSyncDone",
+            value: "true",
+          });
+          console.log("Initial sync completed and marked as done");
+        }
+      } catch (error) {
+        console.error("Database initialization failed:", error);
+      }
+    };
+
+    initializeDatabase();
+  }, [user?.id, initialDataSync]);
 
   const handleDeleteWorkout = (
     e: React.MouseEvent<HTMLButtonElement>,
