@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useWorkout } from "@/lib/hooks/useWorkout";
@@ -45,6 +51,8 @@ export default function WorkoutPage() {
   const [notes, setNotes] = useState("");
   const [isSaved, setIsSaved] = useState(true);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const saveRequestIdRef = useRef<string | null>(null);
+  const isPageVisibleRef = useRef(true);
   /**
    * the idea here is that if we have an exercise that has already
    * been added to the workout, we should be in addSetMode. If the
@@ -127,20 +135,43 @@ export default function WorkoutPage() {
 
   const handleAddClick = async () => {
     setIsSaved(false);
+
+    // Clear any pending auto-save to prevent race conditions
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = null;
+    }
+
     if (addSetMode) return addSet();
     if (addExerciseMode) return addExercise();
   };
 
-  const handleSaveWorkout = async () => {
+  const handleSaveWorkout = useCallback(async () => {
+    if (isSaving || !workout) return;
+
+    // Generate unique request ID to prevent duplicates
+    const requestId = crypto.randomUUID();
+    saveRequestIdRef.current = requestId;
+
     setIsSaving(true);
-    if (!workout) return;
 
-    await saveWorkout(workout?.id, exercises);
+    try {
+      await saveWorkout(workout?.id, exercises);
 
-    setIsSaving(false);
-    setIsSaved(true);
-    localStorage.removeItem("exercises");
-  };
+      // Only update state if this is still the latest request
+      if (saveRequestIdRef.current === requestId) {
+        setIsSaved(true);
+        localStorage.removeItem("exercises");
+      }
+    } catch (error) {
+      console.error("Save failed:", error);
+    } finally {
+      // Only update loading state if this is still the latest request
+      if (saveRequestIdRef.current === requestId) {
+        setIsSaving(false);
+      }
+    }
+  }, [isSaving, workout, saveWorkout, exercises]);
 
   const handleNotesInput = async (
     e: React.ChangeEvent<HTMLTextAreaElement>
@@ -177,24 +208,92 @@ export default function WorkoutPage() {
     router.push("/");
   };
 
-  const addLabel = addSetMode ? "Add Set" : "Add Exercise";
+  // Create stable reference for exercises to prevent unnecessary re-renders
+  const exercisesRef = useRef(exercises);
+  const exercisesSignature = useMemo(() => {
+    return JSON.stringify(
+      exercises.map((ex) => ({
+        id: ex.id,
+        name: ex.name,
+        setsCount: ex.sets.length,
+      }))
+    );
+  }, [exercises]);
 
   useEffect(() => {
-    if (!id) return;
+    exercisesRef.current = exercises;
+  }, [exercises]);
+
+  const addLabel = addSetMode ? "Add Set" : "Add Exercise";
+
+  // Handle page visibility changes (phone lock/unlock)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      isPageVisibleRef.current = !document.hidden;
+
+      if (document.hidden) {
+        // Page is hidden (phone locked) - save immediately if needed
+        if (!isSaved && workout?.id && isOnline && !isSaving) {
+          handleSaveWorkout();
+        }
+        // Clear any pending timeout to prevent duplicate saves
+        if (saveTimeoutRef.current) {
+          clearTimeout(saveTimeoutRef.current);
+          saveTimeoutRef.current = null;
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [handleSaveWorkout, isSaved, workout?.id, isOnline, isSaving]);
+
+  // Auto-save with improved debouncing and deduplication
+  useEffect(() => {
+    if (!id || !workout?.id || !isPageVisibleRef.current) return;
+
+    // Don't schedule save if already saving
+    if (isSaving) return;
+
+    // Clear existing timeout
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
 
     saveTimeoutRef.current = setTimeout(() => {
-      if (notes) {
+      // Only save if page is still visible and we're not already saving
+      if (!isPageVisibleRef.current || isSaving) return;
+
+      const shouldSaveNotes = notes && notes !== (workout.notes || "");
+      const shouldSaveWorkout = !isSaved && isOnline;
+
+      if (shouldSaveNotes) {
         updateNotes(id, notes);
       }
-      if (!isSaved && workout?.id && isOnline) {
-        saveWorkout(workout?.id, exercises).then(() => {
-          setIsSaved(true);
-        });
+
+      if (shouldSaveWorkout) {
+        // Prevent multiple concurrent saves
+        const currentRequestId = crypto.randomUUID();
+        saveRequestIdRef.current = currentRequestId;
+
+        saveWorkout(workout?.id, exercisesRef.current)
+          .then(() => {
+            // Only update state if this is still the latest request
+            if (
+              saveRequestIdRef.current === currentRequestId &&
+              isPageVisibleRef.current
+            ) {
+              setIsSaved(true);
+            }
+          })
+          .catch((error) => {
+            console.error("Auto-save failed:", error);
+          });
       }
-    }, 1500);
+    }, 2000); // Increased debounce time
 
     return () => {
       if (saveTimeoutRef.current) {
@@ -203,14 +302,16 @@ export default function WorkoutPage() {
     };
   }, [
     notes,
-    updateNotes,
-    id,
-    workout,
-    exercises,
+    workout?.notes,
+    workout?.id,
     isSaved,
-    saveWorkout,
     isOnline,
-  ]);
+    isSaving,
+    id,
+    updateNotes,
+    saveWorkout,
+    exercisesSignature,
+  ]); // Use exercises signature for stable dependency
 
   useEffect(() => {
     if (workout?.notes !== undefined) {
