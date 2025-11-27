@@ -31,11 +31,7 @@ export function useWorkout(workoutId: number) {
     try {
       setLoading(true);
       setError(null);
-      // const data = await workoutDataService.getWorkoutWithExercises(
-      //   supabase!,
-      //   workoutId,
-      //   user.id
-      // );
+
       const workout = await db.workouts.get(workoutId);
       const exercises = await db.exercises
         .where("workout_id")
@@ -44,6 +40,7 @@ export function useWorkout(workoutId: number) {
 
       if (workout) setWorkout(workout);
       if (exercises) setExercises(exercises);
+
       setHasLoadedWorkout(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load workout.");
@@ -102,30 +99,6 @@ export function useWorkout(workoutId: number) {
       );
     }
   }
-
-  const loadUserExercises = useCallback(async () => {
-    if (!workoutId || !userId) return;
-
-    try {
-      setLoading(true);
-      setError(null);
-      const userExercises = await exerciseService.getUserExercises(
-        supabase!,
-        userId
-      );
-      setUserExercises(userExercises);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load workout.");
-    } finally {
-      setLoading(false);
-    }
-  }, [supabase, userId, workoutId]);
-
-  useEffect(() => {
-    if (userId) {
-      loadUserExercises();
-    }
-  }, [userId, loadUserExercises]);
 
   async function saveWorkout(workoutId: string, exercises: Exercise[]) {
     if (!userId) return;

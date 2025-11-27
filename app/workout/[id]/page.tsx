@@ -87,6 +87,9 @@ export default function WorkoutPage() {
           .where("user_id")
           .equals(user.id)
           .toArray();
+
+        userExerciseData.sort((a, b) => a.name.localeCompare(b.name));
+
         setUserExercises(userExerciseData);
       } catch (error) {
         console.error("Failed to load workout data:", error);

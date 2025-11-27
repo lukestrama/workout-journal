@@ -1,4 +1,4 @@
-import { localSyncService, workoutService } from "../supabase/services";
+import { localSyncService } from "../supabase/services";
 import { useUser } from "@clerk/nextjs";
 import { Workout } from "../supabase/models";
 import { useEffect, useState, useCallback } from "react";
@@ -21,12 +21,6 @@ export function useWorkouts() {
     return db.workouts.orderBy("date").reverse().toArray();
   };
 
-  const initialDataSync = useCallback(async () => {
-    if (!userId) return;
-    await localSyncService.fullInitialSync(userId, supabase!);
-    loadWorkouts();
-  }, [userId, supabase]);
-
   const loadWorkouts = useCallback(async () => {
     if (!userId) return;
     try {
@@ -45,6 +39,12 @@ export function useWorkouts() {
       loadWorkouts();
     }
   }, [userId, loadWorkouts]);
+
+  const initialDataSync = useCallback(async () => {
+    if (!userId) return;
+    await localSyncService.fullInitialSync(userId, supabase!);
+    loadWorkouts();
+  }, [userId, supabase, loadWorkouts]);
 
   async function createWorkout(
     title: string,
