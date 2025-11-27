@@ -22,7 +22,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import AddWeightReps from "./components/AddWeightReps";
 import { selectStyles } from "@/lib/utils";
-import { useConnectionStatus } from "@/lib/hooks/useConnectionStatus";
 import { useUser } from "@clerk/nextjs";
 
 const defaultWeight = 0;
@@ -30,7 +29,6 @@ const defaultReps = 0;
 
 export default function WorkoutPage() {
   const router = useRouter();
-  const { isOnline } = useConnectionStatus();
   const { user } = useUser();
   const { id } = useParams<{ id: string }>();
 
@@ -43,7 +41,6 @@ export default function WorkoutPage() {
   const [exerciseName, setExerciseName] = useState("");
   const [reps, setReps] = useState<number>(defaultReps);
   const [weight, setWeight] = useState<number>(defaultWeight);
-  const [isSaving, setIsSaving] = useState(false);
   const [notes, setNotes] = useState("");
   const [isSaved, setIsSaved] = useState(true);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -218,17 +215,6 @@ export default function WorkoutPage() {
     setIsSaved(false);
     if (addSetMode) return addSet();
     if (addExerciseMode) return addExercise();
-  };
-
-  const handleSaveWorkout = async () => {
-    setIsSaving(true);
-    if (!workout) return;
-
-    // For now, just mark as saved since we're only using IndexedDB
-    // In the future, this would sync to Supabase
-
-    setIsSaving(false);
-    setIsSaved(true);
   };
 
   const handleNotesInput = async (

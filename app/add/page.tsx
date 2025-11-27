@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useWorkouts } from "@/lib/hooks/useWorkouts";
-import { Workout } from "@/lib/supabase/models";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Header } from "../components/Header";
