@@ -1,23 +1,23 @@
 export interface ExerciseSet {
   weight: number;
   reps: number;
-  exercise_id: string;
+  exercise_id: number;
   notes?: string;
-  id: string | null;
-  temporaryId?: string;
+  id: number | null;
+  temporaryId?: number;
 }
 
 export interface Exercise {
-  id: string | null;
+  id: number | null;
   name: string;
   sets: ExerciseSet[];
-  workout_id: string;
+  workout_id: number;
   workout_date?: string;
-  temporaryId?: string;
+  temporaryId?: number;
 }
 
 export interface Workout {
-  id: string;
+  id: number;
   title: string;
   date: string;
   exercises: Exercise[];
@@ -27,7 +27,7 @@ export interface Workout {
 }
 
 export interface UserExercise {
-  id: string;
+  id: number;
   name: string;
   user_id: string;
 }

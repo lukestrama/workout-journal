@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function genRandomInt() {
-  return Math.random().toString(10).substring(2, 8);
+  return parseInt(Math.random().toString(10).substring(2, 8));
 }
 
 interface StateProperties {

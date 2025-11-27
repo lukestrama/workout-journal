@@ -248,12 +248,12 @@ export default function WorkoutPage() {
             <Header title={workout.title} subtitle={workout.date} />
             <div className="flex flex-col-reverse sm:flex-row gap-4 items-center">
               <div className="flex justify-between gap-4">
-                {workout.lastWorkoutId && (
+                {/* {workout.lastWorkoutId && (
                   <Link href={`/workout/${workout.lastWorkoutId}`}>Prev</Link>
                 )}
                 {workout.nextWorkoutId && (
                   <Link href={`/workout/${workout.nextWorkoutId}`}>Next</Link>
-                )}
+                )} */}
               </div>
               <Button
                 onClick={handleSaveWorkoutAndRedirect}

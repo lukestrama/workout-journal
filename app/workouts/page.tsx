@@ -52,7 +52,7 @@ export default function WorkoutsPage() {
 
   const handleDeleteWorkout = (
     e: React.MouseEvent<HTMLButtonElement>,
-    workoutId: string
+    workoutId: number
   ) => {
     e.preventDefault();
     deleteWorkout(workoutId);

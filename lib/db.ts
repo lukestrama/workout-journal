@@ -13,10 +13,10 @@ export interface SyncMetadata {
 }
 
 export class MyDB extends Dexie {
-  workouts!: Table<Workout, string>;
-  exercises!: Table<Exercise, string>;
-  sets!: Table<ExerciseSet, string>;
-  userExercises!: Table<UserExercise, string>;
+  workouts!: Table<Workout, number>;
+  exercises!: Table<Exercise, number>;
+  sets!: Table<ExerciseSet, number>;
+  userExercises!: Table<UserExercise, number>;
   metadata!: Table<SyncMetadata, string>;
 
   constructor() {

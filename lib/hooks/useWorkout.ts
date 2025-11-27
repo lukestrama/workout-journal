@@ -9,8 +9,9 @@ import { useUser } from "@clerk/nextjs";
 import { Exercise, UserExercise, Workout } from "../supabase/models";
 import { useEffect, useState, useCallback } from "react";
 import { useSupabase } from "../supabase/SupabaseProvider";
+import { db } from "../db";
 
-export function useWorkout(workoutId: string) {
+export function useWorkout(workoutId: number) {
   const { user } = useUser();
   const { supabase } = useSupabase();
 
@@ -30,21 +31,26 @@ export function useWorkout(workoutId: string) {
     try {
       setLoading(true);
       setError(null);
-      const data = await workoutDataService.getWorkoutWithExercises(
-        supabase!,
-        workoutId,
-        user.id
-      );
+      // const data = await workoutDataService.getWorkoutWithExercises(
+      //   supabase!,
+      //   workoutId,
+      //   user.id
+      // );
+      const workout = await db.workouts.get(workoutId);
+      const exercises = await db.exercises
+        .where("workout_id")
+        .equals(workoutId)
+        .toArray();
 
-      setWorkout(data.workout);
-      setExercises(data.exercisesWithSets);
+      if (workout) setWorkout(workout);
+      if (exercises) setExercises(exercises);
       setHasLoadedWorkout(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load workout.");
     } finally {
       setLoading(false);
     }
-  }, [workoutId, supabase, user]);
+  }, [workoutId, user]);
 
   useEffect(() => {
     if (workoutId && !hasLoadedWorkout) {
@@ -191,7 +197,7 @@ export function useWorkout(workoutId: string) {
     }
   }
 
-  async function deleteSet(setId: string) {
+  async function deleteSet(setId: number) {
     try {
       await setsService.deleteSet(supabase!, setId);
       setExercises((prev) => {
@@ -207,7 +213,7 @@ export function useWorkout(workoutId: string) {
     }
   }
 
-  async function deleteExercise(exerciseId: string) {
+  async function deleteExercise(exerciseId: number) {
     try {
       await exerciseService.deleteExercise(supabase!, exerciseId);
       setExercises((prev) => {

@@ -311,7 +311,7 @@ export const exerciseService = {
 
   async deleteExercise(
     supabase: SupabaseClient,
-    exerciseId: string
+    exerciseId: number
   ): Promise<null> {
     const { data, error } = await supabase
       .from("exercises")
@@ -396,7 +396,7 @@ export const setsService = {
 
     return data;
   },
-  async deleteSet(supabase: SupabaseClient, setId: string): Promise<null> {
+  async deleteSet(supabase: SupabaseClient, setId: number): Promise<null> {
     const { data, error } = await supabase
       .from("sets")
       .delete()

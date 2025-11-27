@@ -4,6 +4,7 @@ import { Workout } from "../supabase/models";
 import { useEffect, useState, useCallback } from "react";
 import { useSupabase } from "../supabase/SupabaseProvider";
 import { db } from "../db";
+import { genRandomInt } from "../utils";
 
 export function useWorkouts() {
   const { user } = useUser();
@@ -23,6 +24,7 @@ export function useWorkouts() {
   const initialDataSync = useCallback(async () => {
     if (!userId) return;
     await localSyncService.fullInitialSync(userId, supabase!);
+    loadWorkouts();
   }, [userId, supabase]);
 
   const loadWorkouts = useCallback(async () => {
@@ -48,7 +50,7 @@ export function useWorkouts() {
     title: string,
     date: string,
     type: string
-  ): Promise<string | void> {
+  ): Promise<number | void> {
     if (!userId) throw Error("Must be signed in to create a workout");
 
     try {
@@ -59,7 +61,7 @@ export function useWorkouts() {
         type,
         exercises: [],
         user_id: userId,
-        id: crypto.randomUUID(),
+        id: genRandomInt(),
       });
 
       setWorkouts(await getWorkoutsSortedByDate());
@@ -72,7 +74,7 @@ export function useWorkouts() {
     }
   }
 
-  async function deleteWorkout(workoutId: string) {
+  async function deleteWorkout(workoutId: number) {
     if (!workoutId) return;
 
     try {
