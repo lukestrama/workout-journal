@@ -62,6 +62,7 @@ export const localSyncService = {
                   ...exercise,
                   id: exercise.id,
                   workout_id: exercise.workout_id,
+                  workout_date: workout.date,
                 });
 
                 // Insert sets

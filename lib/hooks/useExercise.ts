@@ -1,8 +1,8 @@
 import { useSupabase } from "../supabase/SupabaseProvider";
-import { exerciseService } from "../supabase/services";
 import { useState, useEffect } from "react";
 import { Exercise } from "../supabase/models";
 import { useUser } from "@clerk/nextjs";
+import { db } from "../db";
 
 export function useExercise(exercise: Exercise) {
   const { supabase } = useSupabase();
@@ -17,13 +17,22 @@ export function useExercise(exercise: Exercise) {
 
     const fetchExercises = async () => {
       try {
-        const workouts = await exerciseService.getLastExercisesByName(
-          supabase,
-          exercise.name,
-          user.id
-        );
+        const workouts = await db.exercises
+          .where("name")
+          .equals(exercise.name)
+          .toArray();
 
-        if (!isCancelled) {
+        workouts.sort((a, b) => {
+          if (a.workout_date && b.workout_date) {
+            return (
+              new Date(b.workout_date).getTime() -
+              new Date(a.workout_date).getTime()
+            );
+          }
+          return 0;
+        });
+
+        if (!isCancelled && workouts.length) {
           setLastExercises(workouts);
           setError(null);
         }
