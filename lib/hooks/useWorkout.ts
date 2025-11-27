@@ -176,7 +176,7 @@ export function useWorkout(workoutId: number) {
       setExercises((prev) => {
         return prev.map((exercise) => ({
           ...exercise,
-          sets: exercise.sets.filter((set) => set.id !== setId),
+          sets: exercise.sets?.filter((set) => set.id !== setId),
         }));
       });
     } catch (err) {

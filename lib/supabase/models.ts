@@ -5,29 +5,36 @@ export interface ExerciseSet {
   notes?: string;
   id: number | null;
   temporaryId?: number;
+  synced?: boolean;
+  deleted?: boolean;
 }
 
 export interface Exercise {
   id: number | null;
   name: string;
-  sets: ExerciseSet[];
+  sets?: ExerciseSet[];
   workout_id: number;
   workout_date?: string;
   temporaryId?: number;
+  synced?: boolean;
+  deleted?: boolean;
 }
 
 export interface Workout {
   id: number;
   title: string;
   date: string;
-  exercises: Exercise[];
+  exercises?: Exercise[];
   user_id: string;
   notes?: string;
   type: string;
+  synced?: boolean;
+  deleted?: boolean;
 }
 
 export interface UserExercise {
   id: number;
   name: string;
   user_id: string;
+  synced?: boolean;
 }

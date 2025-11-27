@@ -17,15 +17,17 @@ export function useWorkouts() {
   // Extract stable user ID to prevent unnecessary re-renders on session refresh
   const userId = user?.id;
 
-  const getWorkoutsSortedByDate = () => {
-    return db.workouts.orderBy("date").reverse().toArray();
+  const getWorkoutsSortedByDate = async () => {
+    const workouts = await db.workouts;
+    const activeWorkouts = await workouts.filter((w) => !w.deleted).toArray();
+    return activeWorkouts.sort((a, b) => (a.date < b.date ? 1 : -1));
   };
 
   const loadWorkouts = useCallback(async () => {
     if (!userId) return;
     try {
       // Returns all workouts sorted by date ascending
-      const workouts = await db.workouts.orderBy("date").reverse().toArray();
+      const workouts = await getWorkoutsSortedByDate();
       setWorkouts(workouts);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load workouts.");
@@ -62,6 +64,7 @@ export function useWorkouts() {
         exercises: [],
         user_id: userId,
         id: genRandomInt(),
+        synced: false,
       });
 
       setWorkouts(await getWorkoutsSortedByDate());
@@ -78,7 +81,13 @@ export function useWorkouts() {
     if (!workoutId) return;
 
     try {
-      await db.workouts.delete(workoutId);
+      const workout = await db.workouts.get(workoutId);
+      if (workout?.synced === true) {
+        // Soft delete from Dexie if synced
+        await db.workouts.update(workoutId, { deleted: true });
+      } else {
+        await db.workouts.delete(workoutId);
+      }
       setWorkouts(await getWorkoutsSortedByDate());
     } catch (error) {
       setError(

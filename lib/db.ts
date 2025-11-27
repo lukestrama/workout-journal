@@ -23,10 +23,10 @@ export class MyDB extends Dexie {
     super("workoutdb");
 
     this.version(1).stores({
-      workouts: "id, user_id, date, type",
-      exercises: "id, workout_id, name",
-      sets: "id, exercise_id",
-      userExercises: "id, user_id, name",
+      workouts: "id, user_id, date, type, synced",
+      exercises: "id, workout_id, name, synced",
+      sets: "id, exercise_id, synced",
+      userExercises: "id, user_id, name, synced",
       metadata: "key, value",
     });
   }

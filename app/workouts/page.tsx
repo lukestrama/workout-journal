@@ -13,6 +13,7 @@ import Spinner from "../components/Spinner";
 import Dialog from "../components/Dialog";
 import { db } from "@/lib/db";
 import { useEffect } from "react";
+import { SyncButton } from "../components/SyncButton";
 
 export default function WorkoutsPage() {
   const { user } = useUser();
@@ -68,6 +69,7 @@ export default function WorkoutsPage() {
         <>
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold">My Workouts</h1>
+            <SyncButton />
             <Button asChild>
               <Link href="/add">Add workout</Link>
             </Button>

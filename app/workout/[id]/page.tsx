@@ -125,6 +125,7 @@ export default function WorkoutPage() {
         const newUserExercise: UserExercise = {
           name: option.value,
           user_id: user.id,
+          synced: false,
           id: Date.now(), // Dexie will replace this with auto-generated ID
         };
 
@@ -155,6 +156,7 @@ export default function WorkoutPage() {
       const newExercise: Exercise = {
         name: exerciseName,
         workout_id: workoutId,
+        synced: false,
         id: Date.now(), // Dexie will replace this with auto-generated ID
         sets: [],
       };
@@ -168,6 +170,7 @@ export default function WorkoutPage() {
     const newSet: ExerciseSet = {
       weight,
       reps,
+      synced: false,
       exercise_id: targetExercise.id!,
       id: Date.now(), // Dexie will replace this with auto-generated ID
     };
@@ -195,6 +198,7 @@ export default function WorkoutPage() {
     const newExercise: Exercise = {
       name: exerciseName,
       workout_id: parseInt(id),
+      synced: false,
       id: Date.now(), // Dexie will replace this with auto-generated ID
       sets: [],
     };
@@ -243,17 +247,22 @@ export default function WorkoutPage() {
 
   const handleSetDelete = async (setId: number) => {
     try {
-      // Delete from Dexie
-      await db.sets.delete(setId);
+      const set = await db.sets.get(setId);
+      if (set?.synced === true) {
+        // Soft delete from Dexie if synced
+        await db.sets.update(setId, { deleted: true });
+      } else {
+        await db.sets.delete(setId);
+      }
 
       // Update local state
       setExercises((prev) => {
         return prev
           .map((exercise) => ({
             ...exercise,
-            sets: exercise.sets.filter((set) => set.id !== setId),
+            sets: exercise.sets?.filter((set) => set.id !== setId),
           }))
-          .filter((exercise) => exercise.sets.length > 0);
+          .filter((exercise) => exercise.sets?.length > 0);
       });
       setIsSaved(false);
     } catch (error) {
@@ -264,8 +273,20 @@ export default function WorkoutPage() {
   const handleExerciseDelete = async (exerciseId: number) => {
     try {
       // Delete all sets for this exercise first
-      await db.sets.where("exercise_id").equals(exerciseId).delete();
-
+      const sets = await db.sets
+        .where("exercise_id")
+        .equals(exerciseId)
+        .toArray();
+      for (const set of sets) {
+        handleSetDelete(set.id!);
+      }
+      const exercise = await db.exercises.get(exerciseId);
+      if (exercise?.synced === true) {
+        // Soft delete from Dexie if synced
+        await db.exercises.update(exerciseId, { deleted: true });
+      } else {
+        await db.exercises.delete(exerciseId);
+      }
       // Delete the exercise
       await db.exercises.delete(exerciseId);
 

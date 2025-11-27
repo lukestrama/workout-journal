@@ -46,6 +46,7 @@ export const localSyncService = {
             await db.userExercises.put({
               ...exercise,
               id: exercise.id,
+              synced: true,
             });
           }
           // Insert workouts
@@ -53,6 +54,7 @@ export const localSyncService = {
             await db.workouts.put({
               ...workout,
               id: workout.id,
+              synced: true,
             });
 
             // Insert exercises
@@ -63,6 +65,7 @@ export const localSyncService = {
                   id: exercise.id,
                   workout_id: exercise.workout_id,
                   workout_date: workout.date,
+                  synced: true,
                 });
 
                 // Insert sets
@@ -72,6 +75,7 @@ export const localSyncService = {
                       ...set,
                       id: set.id,
                       exercise_id: set.exercise_id,
+                      synced: true,
                     });
                   }
                 }
@@ -205,7 +209,7 @@ export const workoutService = {
       for (const row of exerciseRows) {
         const exercise = exercises.find((ex) => ex.name === row.name);
 
-        exercise?.sets.forEach((set) => {
+        exercise?.sets?.forEach((set) => {
           allSets.push({
             weight: set.weight,
             reps: set.reps,
@@ -219,7 +223,7 @@ export const workoutService = {
         const exercise = exercises.find((ex) => ex.name === row.name);
 
         exercise?.sets
-          .filter((set) => set.id === null)
+          ?.filter((set) => set.id === null)
           .forEach((set) => {
             allSets.push({
               weight: set.weight,
