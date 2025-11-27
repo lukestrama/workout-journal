@@ -3,14 +3,14 @@ export interface ExerciseSet {
   reps: number;
   exercise_id: number;
   notes?: string;
-  id: number | null;
+  id: number;
   temporaryId?: number;
   synced?: boolean;
   deleted?: boolean;
 }
 
 export interface Exercise {
-  id: number | null;
+  id: number;
   name: string;
   sets?: ExerciseSet[];
   workout_id: number;

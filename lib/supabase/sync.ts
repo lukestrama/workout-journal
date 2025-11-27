@@ -87,6 +87,14 @@ export async function syncWithSupabase(supabase: SupabaseClient) {
   await supabase.from("exercises").upsert(unsyncedExercises);
   await supabase.from("sets").upsert(unsyncedSets);
 
+  const deletedWorkouts = await db.workouts
+    .filter((w) => w.deleted === true)
+    .toArray();
+  const deletedExercises = await db.exercises
+    .filter((e) => e.deleted === true)
+    .toArray();
+  const deletedSets = await db.sets.filter((s) => s.deleted === true).toArray();
+
   // Mark them as synced
   await db.transaction("rw", db.workouts, db.exercises, db.sets, async () => {
     for (const w of unsyncedWorkouts)
@@ -95,6 +103,34 @@ export async function syncWithSupabase(supabase: SupabaseClient) {
       await db.exercises.update(e.id!, { synced: true }); // Use e.id! instead of e
     for (const s of unsyncedSets) await db.sets.update(s.id!, { synced: true }); // Use s.id! instead of s
   });
+
+  await supabase
+    .from("workouts")
+    .delete()
+    .in(
+      "id",
+      deletedWorkouts.map((w) => w.id)
+    );
+  await supabase
+    .from("exercises")
+    .delete()
+    .in(
+      "id",
+      deletedExercises.map((e) => e.id)
+    );
+  await supabase
+    .from("sets")
+    .delete()
+    .in(
+      "id",
+      deletedSets.map((s) => s.id)
+    );
+
+  await Promise.all([
+    db.workouts.bulkDelete(deletedWorkouts.map((w) => w.id)),
+    db.exercises.bulkDelete(deletedExercises.map((e) => e.id)),
+    db.sets.bulkDelete(deletedSets.map((s) => s.id)),
+  ]);
 
   // -----------------------------
   // 2. PULL remote changes

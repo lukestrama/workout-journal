@@ -255,7 +255,6 @@ export default function WorkoutPage() {
         await db.sets.delete(setId);
       }
 
-      // Update local state
       setExercises((prev) => {
         return prev
           .map((exercise) => ({
