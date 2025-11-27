@@ -208,7 +208,7 @@ export default function WorkoutPage() {
     setExercises((prev) =>
       prev.map((ex) =>
         ex.id === targetExercise!.id
-          ? { ...ex, sets: [...ex.sets, createdSet] }
+          ? { ...ex, sets: [...(ex.sets || []), createdSet] }
           : ex
       )
     );
