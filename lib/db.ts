@@ -23,9 +23,9 @@ export class MyDB extends Dexie {
     super("workoutdb");
 
     this.version(1).stores({
-      workouts: "id, user_id, date, title, type",
+      workouts: "id, user_id, date, type",
       exercises: "id, workout_id, name",
-      sets: "id, exercise_id, weight, reps",
+      sets: "id, exercise_id",
       userExercises: "id, user_id, name",
       metadata: "key, value",
     });

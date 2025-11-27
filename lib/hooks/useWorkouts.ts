@@ -16,6 +16,10 @@ export function useWorkouts() {
   // Extract stable user ID to prevent unnecessary re-renders on session refresh
   const userId = user?.id;
 
+  const getWorkoutsSortedByDate = () => {
+    return db.workouts.orderBy("date").reverse().toArray();
+  };
+
   const initialDataSync = useCallback(async () => {
     if (!userId) return;
     await localSyncService.fullInitialSync(userId, supabase!);
@@ -58,7 +62,7 @@ export function useWorkouts() {
         id: crypto.randomUUID(),
       });
 
-      setWorkouts(await db.workouts.orderBy("date").reverse().toArray());
+      setWorkouts(await getWorkoutsSortedByDate());
 
       return workoutId;
     } catch (error) {
@@ -72,8 +76,8 @@ export function useWorkouts() {
     if (!workoutId) return;
 
     try {
-      await workoutService.deleteWorkout(supabase!, workoutId);
-      setWorkouts((prev) => prev.filter((ex) => ex.id !== workoutId));
+      await db.workouts.delete(workoutId);
+      setWorkouts(await getWorkoutsSortedByDate());
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Failed to delete workout"
