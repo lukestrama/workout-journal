@@ -256,12 +256,10 @@ export default function WorkoutPage() {
       }
 
       setExercises((prev) => {
-        return prev
-          .map((exercise) => ({
-            ...exercise,
-            sets: exercise.sets?.filter((set) => set.id !== setId),
-          }))
-          .filter((exercise) => exercise.sets?.length > 0);
+        return prev.map((exercise) => ({
+          ...exercise,
+          sets: exercise.sets?.filter((set) => set.id !== setId),
+        }));
       });
       setIsSaved(false);
     } catch (error) {
@@ -297,16 +295,6 @@ export default function WorkoutPage() {
     } catch (error) {
       console.error("Failed to delete exercise:", error);
     }
-  };
-
-  const handleSaveWorkoutAndRedirect = async () => {
-    if (!isOnline) return alert("You're offline.");
-    if (!isSaved) {
-      setIsSaving(true);
-      await handleSaveWorkout();
-      setIsSaving(false);
-    }
-    router.push("/");
   };
 
   const addLabel = addSetMode ? "Add Set" : "Add Exercise";
@@ -360,11 +348,6 @@ export default function WorkoutPage() {
         </div>
       ) : (
         <>
-          {!isOnline && (
-            <p className="bg-red-500 text-center w-full mb-5">
-              You are currently offline
-            </p>
-          )}
           <div className="flex items-start mb-5 sm:items-center">
             <Header title={workout.title} subtitle={workout.date} />
             <div className="flex flex-col-reverse sm:flex-row gap-4 items-center">
@@ -377,12 +360,11 @@ export default function WorkoutPage() {
                 )} */}
               </div>
               <Button
-                onClick={handleSaveWorkoutAndRedirect}
+                onClick={() => router.push("/")}
                 className=""
                 variant={"secondary"}
-                disabled={isSaving}
               >
-                {isSaving ? "Saving..." : "Back to workouts"}
+                Back to workouts
               </Button>
             </div>
           </div>

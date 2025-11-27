@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useSupabase } from "@/lib/supabase/SupabaseProvider";
 import { syncWithSupabase } from "@/lib/supabase/sync";
 import { useState } from "react";
@@ -13,8 +14,8 @@ export function SyncButton() {
   }
 
   return (
-    <button onClick={handleSync} disabled={loading}>
+    <Button variant={"secondary"} onClick={handleSync} disabled={loading}>
       {loading ? "Syncing..." : "Sync Now"}
-    </button>
+    </Button>
   );
 }

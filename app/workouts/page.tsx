@@ -67,12 +67,14 @@ export default function WorkoutsPage() {
         </div>
       ) : (
         <>
-          <div className="flex justify-between items-center">
+          <div className="flex sm:justify-between sm:items-center flex-col sm:flex-row">
             <h1 className="text-2xl font-bold">My Workouts</h1>
-            <SyncButton />
-            <Button asChild>
-              <Link href="/add">Add workout</Link>
-            </Button>
+            <div className="gap-4 flex">
+              <SyncButton />
+              <Button asChild>
+                <Link href="/add">Add workout</Link>
+              </Button>
+            </div>
           </div>
           {workouts.length === 0 ? (
             loading ? (

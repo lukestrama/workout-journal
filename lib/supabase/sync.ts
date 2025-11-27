@@ -9,28 +9,6 @@ export async function syncWithSupabase(supabase: SupabaseClient) {
   const allExercises = await db.exercises.toArray();
   const allSets = await db.sets.toArray();
 
-  debugger;
-  console.log(
-    "All workouts:",
-    allWorkouts.map((w) => ({ id: w.id, synced: w.synced }))
-  );
-  console.log(
-    "All exercises:",
-    allExercises.map((e) => ({
-      id: e.id,
-      synced: e.synced,
-      workout_id: e.workout_id,
-    }))
-  );
-  console.log(
-    "All sets:",
-    allSets.map((s) => ({
-      id: s.id,
-      synced: s.synced,
-      exercise_id: s.exercise_id,
-    }))
-  );
-
   // Fix any records without synced field (assuming they're synced if they exist)
   for (const workout of allWorkouts) {
     if (workout.synced === undefined) {
@@ -72,15 +50,6 @@ export async function syncWithSupabase(supabase: SupabaseClient) {
   for (const s of unsyncedSets) {
     delete s.synced;
   }
-
-  console.log("Sync debug info:");
-  console.log("Unsynced workouts:", unsyncedWorkouts.length, unsyncedWorkouts);
-  console.log(
-    "Unsynced exercises:",
-    unsyncedExercises.length,
-    unsyncedExercises
-  );
-  console.log("Unsynced sets:", unsyncedSets.length, unsyncedSets);
 
   // Push to Supabase (example)
   await supabase.from("workouts").upsert(unsyncedWorkouts);
