@@ -3,6 +3,7 @@ import { useUser } from "@clerk/nextjs";
 import { Workout } from "../supabase/models";
 import { useEffect, useState, useCallback } from "react";
 import { useSupabase } from "../supabase/SupabaseProvider";
+import { db } from "../db";
 
 export function useWorkouts() {
   const { user } = useUser();
@@ -23,16 +24,15 @@ export function useWorkouts() {
   const loadWorkouts = useCallback(async () => {
     if (!userId) return;
     try {
-      setLoading(true);
-      setError(null);
-      const data = await workoutService.getWorkouts(supabase!, userId);
-      setWorkouts(data);
+      // Returns all workouts sorted by date ascending
+      const workouts = await db.workouts.orderBy("date").reverse().toArray();
+      setWorkouts(workouts);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load workouts.");
     } finally {
       setLoading(false);
     }
-  }, [userId, supabase]);
+  }, [userId]);
 
   useEffect(() => {
     if (userId) {
@@ -44,22 +44,23 @@ export function useWorkouts() {
     title: string,
     date: string,
     type: string
-  ): Promise<Workout | undefined> {
+  ): Promise<string | void> {
     if (!userId) throw Error("Must be signed in to create a workout");
-    let workout: Workout;
 
     try {
       setLoading(true);
-      workout = await workoutService.createWorkout(supabase!, {
+      const workoutId = await db.workouts.put({
         title,
         date,
         type,
+        exercises: [],
         user_id: userId,
+        id: crypto.randomUUID(),
       });
 
-      setWorkouts((prev) => [workout, ...prev]);
+      setWorkouts(await db.workouts.orderBy("date").reverse().toArray());
 
-      return workout;
+      return workoutId;
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Failed to create workout"

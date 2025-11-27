@@ -24,8 +24,6 @@ export interface Workout {
   user_id: string;
   notes?: string;
   type: string;
-  lastWorkoutId: string | null;
-  nextWorkoutId: string | null;
 }
 
 export interface UserExercise {

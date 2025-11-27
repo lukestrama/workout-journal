@@ -22,8 +22,8 @@ export default function AddWorkoutPage() {
 
   const handleSave = async () => {
     setLoading(true);
-    const workout: Workout | undefined = await createWorkout(title, date, type);
-    if (workout) router.push(`/workout/${workout.id}`);
+    const workoutId = await createWorkout(title, date, type);
+    router.push(`/workout/${workoutId}`);
     setLoading(false);
   };
 
