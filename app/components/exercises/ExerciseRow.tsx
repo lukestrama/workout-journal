@@ -9,35 +9,27 @@ import { useExercise } from "@/lib/hooks/useExercise";
 
 interface ExerciseRowProps {
   exercise: Exercise;
-  deleteSet: (setId: string) => void;
-  removeLocalSet: (setId: string) => void;
-  removeLocalExercise: (exerciseId: string) => void;
-  deleteExercise: (exerciseId: string) => void;
+  deleteSet: (setId: number) => void;
+  deleteExercise: (exerciseId: number) => void;
   workoutDate: string;
 }
 const ExerciseRow = ({
   exercise,
-  deleteSet,
-  deleteExercise,
-  removeLocalSet,
-  removeLocalExercise,
   workoutDate,
+  deleteExercise,
+  deleteSet,
 }: ExerciseRowProps) => {
   const { lastExercises } = useExercise(exercise);
 
   const handleSetDelete = async (set: ExerciseSet) => {
     if (set.id) {
-      await deleteSet(set.id);
-    } else if (set.temporaryId) {
-      removeLocalSet(set.temporaryId);
+      deleteSet(set.id);
     }
   };
 
   const handleExerciseDelete = async (exercise: Exercise) => {
     if (exercise.id) {
-      await deleteExercise(exercise.id);
-    } else if (exercise.temporaryId) {
-      removeLocalExercise(exercise.temporaryId);
+      deleteExercise(exercise.id);
     }
   };
 
