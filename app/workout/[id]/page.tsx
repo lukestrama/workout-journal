@@ -270,8 +270,6 @@ export default function WorkoutPage() {
       } else {
         await db.exercises.delete(exerciseId);
       }
-      // Delete the exercise
-      await db.exercises.delete(exerciseId);
 
       // Update local state
       setExercises((prev) => {

@@ -69,8 +69,8 @@ export async function syncWithSupabase(supabase: SupabaseClient) {
     for (const w of unsyncedWorkouts)
       await db.workouts.update(w.id, { synced: true });
     for (const e of unsyncedExercises)
-      await db.exercises.update(e.id!, { synced: true }); // Use e.id! instead of e
-    for (const s of unsyncedSets) await db.sets.update(s.id!, { synced: true }); // Use s.id! instead of s
+      await db.exercises.update(e.id!, { synced: true });
+    for (const s of unsyncedSets) await db.sets.update(s.id!, { synced: true });
   });
 
   await supabase
