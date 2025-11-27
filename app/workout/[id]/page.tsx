@@ -45,6 +45,9 @@ export default function WorkoutPage() {
   const [isSaved, setIsSaved] = useState(true);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [lastWorkoutId, setLastWorkoutId] = useState<number | null>(null);
+  const [nextWorkoutId, setNextWorkoutId] = useState<number | null>(null);
+
   // Load workout and exercises from Dexie
   useEffect(() => {
     const loadWorkoutData = async () => {
@@ -58,6 +61,32 @@ export default function WorkoutPage() {
         const workoutData = await db.workouts.get(workoutId);
         if (workoutData) {
           setWorkout(workoutData);
+
+          // Find previous and next workouts of the same type
+          const allWorkouts = await db.workouts
+            .where("user_id")
+            .equals(user.id)
+            .and((w) => w.type === workoutData.type)
+            .toArray();
+
+          // Sort by date
+          allWorkouts.sort(
+            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+          );
+
+          const currentIndex = allWorkouts.findIndex((w) => w.id === workoutId);
+
+          if (currentIndex > 0) {
+            setLastWorkoutId(allWorkouts[currentIndex - 1].id!);
+          } else {
+            setLastWorkoutId(null);
+          }
+
+          if (currentIndex < allWorkouts.length - 1) {
+            setNextWorkoutId(allWorkouts[currentIndex + 1].id!);
+          } else {
+            setNextWorkoutId(null);
+          }
         }
 
         // Load exercises for this workout
@@ -336,12 +365,12 @@ export default function WorkoutPage() {
             <Header title={workout.title} subtitle={workout.date} />
             <div className="flex flex-col-reverse sm:flex-row gap-4 items-center">
               <div className="flex justify-between gap-4">
-                {/* {workout.lastWorkoutId && (
-                  <Link href={`/workout/${workout.lastWorkoutId}`}>Prev</Link>
+                {lastWorkoutId && (
+                  <Link href={`/workout/${lastWorkoutId}`}>Prev</Link>
                 )}
-                {workout.nextWorkoutId && (
-                  <Link href={`/workout/${workout.nextWorkoutId}`}>Next</Link>
-                )} */}
+                {nextWorkoutId && (
+                  <Link href={`/workout/${nextWorkoutId}`}>Next</Link>
+                )}
               </div>
               <Button
                 onClick={() => router.push("/")}
